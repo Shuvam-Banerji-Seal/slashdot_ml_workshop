@@ -1,0 +1,582 @@
+% =============================================================================
+% Section 2: Real & Complex Numbers
+% Where mathematics gets truly beautiful
+% =============================================================================
+
+\section{Real \& Complex Numbers}
+
+% -----------------------------------------------------------------------------
+% Opening
+% -----------------------------------------------------------------------------
+\begin{frame}{Beyond Rationals: The Irrational Truth}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{funnybox}
+                \textit{``When the Pythagoreans discovered irrational numbers, they were so upset they allegedly drowned the messenger. Math: serious business since 500 BC.''}
+            \end{funnybox}
+            
+            \vspace{0.3cm}
+            
+            \textbf{The Problem:}
+            
+            Not all numbers can be written as $\frac{p}{q}$!
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.85]
+                % Unit square with diagonal
+                \draw[accentcyan,thick] (0,0) rectangle (2,2);
+                \draw[neonpink,very thick] (0,0) -- (2,2);
+                
+                \node[below,fgwhite] at (1,0) {$1$};
+                \node[left,fgwhite] at (0,1) {$1$};
+                \node[above right,neonpink] at (1,1) {$\sqrt{2}$};
+                
+                % Question mark
+                \node[neonyellow,font=\Huge] at (3,1) {?};
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Proof that sqrt(2) is irrational
+% -----------------------------------------------------------------------------
+\begin{frame}{Proof: $\sqrt{2}$ is Irrational}
+    \begin{thmbox}[Theorem]
+        $\sqrt{2}$ cannot be expressed as a fraction $\frac{p}{q}$ where $p, q \in \mathbb{Z}$.
+    \end{thmbox}
+    
+    \textbf{Proof by Contradiction:}
+    \begin{enumerate}
+        \item Assume $\sqrt{2} = \frac{p}{q}$ in lowest terms (gcd$(p,q) = 1$)
+        \item Then $2 = \frac{p^2}{q^2}$, so $p^2 = 2q^2$
+        \item Therefore $p^2$ is even, which means $p$ is even
+        \item Let $p = 2k$, then $(2k)^2 = 2q^2 \Rightarrow 4k^2 = 2q^2 \Rightarrow q^2 = 2k^2$
+        \item So $q^2$ is even, meaning $q$ is even
+        \item \textcolor{neonpink}{Contradiction!} Both $p$ and $q$ are even, but we said gcd$(p,q) = 1$
+    \end{enumerate}
+    
+    \begin{keybox}
+        $\sqrt{2} \approx 1.41421356...$ goes on forever without repeating! \qed
+    \end{keybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Famous Irrationals
+% -----------------------------------------------------------------------------
+\begin{frame}{Famous Irrational Numbers}
+    \begin{columns}[T]
+        \begin{column}{0.33\textwidth}
+            \centering
+            \begin{tikzpicture}
+                \fill[neonpink!20] (0,0) circle (1cm);
+                \draw[neonpink,thick] (0,0) circle (1cm);
+                \node[neonpink,font=\huge] at (0,0) {$\pi$};
+            \end{tikzpicture}
+            
+            \vspace{0.2cm}
+            
+            $\pi = 3.14159...$
+            
+            \vspace{0.1cm}
+            
+            {\small Ratio of circumference to diameter}
+        \end{column}
+        \begin{column}{0.33\textwidth}
+            \centering
+            \begin{tikzpicture}
+                \draw[neongreen,thick,domain=0:1.5,smooth,variable=\x] 
+                    plot ({\x},{exp(\x)/3});
+                \node[neongreen,font=\huge] at (0.75,1.5) {$e$};
+            \end{tikzpicture}
+            
+            \vspace{0.2cm}
+            
+            $e = 2.71828...$
+            
+            \vspace{0.1cm}
+            
+            {\small Base of natural logarithm}
+        \end{column}
+        \begin{column}{0.33\textwidth}
+            \centering
+            \begin{tikzpicture}
+                \draw[neonyellow,thick] (0,0) -- (1.618,0) -- (1.618,1) -- (0,1) -- cycle;
+                \draw[neonyellow] (1,0) -- (1,1);
+                \node[neonyellow,font=\huge] at (0.8,1.5) {$\phi$};
+            \end{tikzpicture}
+            
+            \vspace{0.2cm}
+            
+            $\phi = 1.61803...$
+            
+            \vspace{0.1cm}
+            
+            {\small Golden ratio: $\frac{1+\sqrt{5}}{2}$}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.5cm}
+    
+    \begin{funnybox}
+        These numbers show up \textit{everywhere}: nature, art, physics, and yes... machine learning!
+    \end{funnybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Real Numbers Definition
+% -----------------------------------------------------------------------------
+\begin{frame}{Real Numbers $\mathbb{R}$: Filling the Gaps}
+    \begin{defbox}[Real Numbers]
+        The \glow{real numbers} $\mathbb{R}$ include all rationals AND all irrationals:
+        \[
+            \mathbb{R} = \mathbb{Q} \cup \{\text{irrational numbers}\}
+        \]
+        
+        They form a \textbf{complete}, \textbf{ordered} field — every point on the number line!
+    \end{defbox}
+    
+    \vspace{0.3cm}
+    
+    \centering
+    \begin{tikzpicture}[scale=0.85]
+        % Continuous number line
+        \shade[left color=neonpink!50,right color=accentcyan!50] (-4,-0.1) rectangle (4,0.1);
+        \draw[<->,thick,fgwhite] (-4.5,0) -- (4.5,0);
+        
+        % Mark some points
+        \fill[neonyellow] (-3.14159,0) circle (3pt) node[above=3pt,font=\small] {$-\pi$};
+        \fill[neongreen] (-1,0) circle (3pt) node[below=3pt,font=\small] {$-1$};
+        \fill[accentcyan] (0,0) circle (3pt) node[below=3pt,font=\small] {$0$};
+        \fill[neongreen] (1,0) circle (3pt) node[below=3pt,font=\small] {$1$};
+        \fill[neonpink] (1.414,0) circle (3pt) node[above=3pt,font=\small] {$\sqrt{2}$};
+        \fill[neonyellow] (2.718,0) circle (3pt) node[above=3pt,font=\small] {$e$};
+        \fill[neonyellow] (3.14159,0) circle (3pt) node[below=3pt,font=\small] {$\pi$};
+    \end{tikzpicture}
+    
+    \vspace{0.3cm}
+    
+    \begin{funnybox}
+        ``Nature hates empty spaces'' — the number line is now completely filled!
+    \end{funnybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Completeness Axiom
+% -----------------------------------------------------------------------------
+\begin{frame}{The Completeness Axiom}
+    \begin{thmbox}[Completeness of $\mathbb{R}$]
+        Every non-empty subset of $\mathbb{R}$ that is bounded above has a \textbf{least upper bound} (supremum) in $\mathbb{R}$.
+    \end{thmbox}
+    
+    \vspace{0.3cm}
+    
+    \textbf{What this means:}
+    \begin{itemize}
+        \item No ``holes'' in the number line
+        \item Limits of convergent sequences always exist
+        \item This is what makes calculus possible!
+    \end{itemize}
+    
+    \vspace{0.3cm}
+    
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \begin{alertbox}[$\mathbb{Q}$ is NOT complete]
+                The sequence $1, 1.4, 1.41, 1.414, ...$
+                
+                converges to $\sqrt{2}$, but $\sqrt{2} \notin \mathbb{Q}$!
+            \end{alertbox}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{successbox}[$\mathbb{R}$ IS complete]
+                Every convergent sequence of reals has its limit in $\mathbb{R}$.
+            \end{successbox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Complex Numbers - The Final Frontier
+% -----------------------------------------------------------------------------
+\begin{frame}{Complex Numbers $\mathbb{C}$: Inventing the Impossible}
+    \begin{columns}[T]
+        \begin{column}{0.55\textwidth}
+            \begin{alertbox}[The Last Problem]
+                What is $\sqrt{-1}$?
+                
+                \vspace{0.2cm}
+                
+                No real number squared gives $-1$!
+                
+                \vspace{0.2cm}
+                
+                $x^2 = -1 \Rightarrow x = $ \textcolor{neonpink}{???}
+            \end{alertbox}
+            
+            \vspace{0.3cm}
+            
+            \begin{defbox}[Imaginary Unit]
+                Define $i$ such that:
+                \[
+                    \mathbf{i^2 = -1}
+                \]
+                
+                Then $\sqrt{-1} = i$
+            \end{defbox}
+        \end{column}
+        \begin{column}{0.45\textwidth}
+            \begin{funnybox}
+                ``Can't solve it? Just \textbf{invent} a number!''
+                
+                \vspace{0.2cm}
+                
+                — Mathematicians, probably
+            \end{funnybox}
+            
+            \vspace{0.3cm}
+            
+            \textbf{Powers of $i$:}
+            \begin{align*}
+                i^0 &= 1 \\
+                i^1 &= i \\
+                i^2 &= -1 \\
+                i^3 &= -i \\
+                i^4 &= 1 \text{ (cycle repeats!)}
+            \end{align*}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Complex Number Definition
+% -----------------------------------------------------------------------------
+\begin{frame}{Complex Numbers: Definition}
+    \begin{defbox}[Complex Numbers]
+        A \glow{complex number} has the form:
+        \[
+            z = a + bi
+        \]
+        where $a, b \in \mathbb{R}$ and $i^2 = -1$.
+        
+        \vspace{0.2cm}
+        
+        \begin{itemize}
+            \item $a$ = \textbf{real part}: Re$(z)$
+            \item $b$ = \textbf{imaginary part}: Im$(z)$
+        \end{itemize}
+        
+        \vspace{0.2cm}
+        
+        The set of all complex numbers:
+        \[
+            \mathbb{C} = \{a + bi \mid a, b \in \mathbb{R}\}
+        \]
+    \end{defbox}
+    
+    \vspace{0.3cm}
+    
+    \textbf{Examples:}
+    \begin{itemize}
+        \item $3 + 2i$ (real part 3, imaginary part 2)
+        \item $-1 - 4i$ (real part $-1$, imaginary part $-4$)
+        \item $5 = 5 + 0i$ (real numbers are complex too!)
+        \item $2i = 0 + 2i$ (purely imaginary)
+    \end{itemize}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Complex Plane
+% -----------------------------------------------------------------------------
+\begin{frame}{The Complex Plane}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.9]
+                % Axes
+                \draw[<->,thick,accentcyan] (-3,0) -- (3,0) node[right] {Re};
+                \draw[<->,thick,accentcyan] (0,-3) -- (0,3) node[above] {Im};
+                
+                % Grid
+                \draw[softgray,very thin] (-2.5,-2.5) grid (2.5,2.5);
+                
+                % Complex number
+                \fill[neonpink] (2,1.5) circle (4pt);
+                \draw[neonpink,thick,->] (0,0) -- (2,1.5);
+                \node[neonpink,above right] at (2,1.5) {$z = 2 + 1.5i$};
+                
+                % Projections
+                \draw[neonyellow,dashed] (2,0) -- (2,1.5);
+                \draw[neonyellow,dashed] (0,1.5) -- (2,1.5);
+                
+                % Labels
+                \node[below,fgwhite] at (2,0) {$2$};
+                \node[left,fgwhite] at (0,1.5) {$1.5i$};
+                
+                % Magnitude
+                \node[neongreen,font=\small] at (1.3,0.4) {$|z|$};
+            \end{tikzpicture}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{infobox}[Argand Diagram]
+                Complex numbers live on a 2D plane!
+                
+                \vspace{0.2cm}
+                
+                \begin{itemize}
+                    \item x-axis: real part
+                    \item y-axis: imaginary part
+                \end{itemize}
+                
+                \vspace{0.2cm}
+                
+                \textbf{Modulus} (magnitude):
+                \[
+                    |z| = \sqrt{a^2 + b^2}
+                \]
+                
+                \textbf{Argument} (angle):
+                \[
+                    \arg(z) = \tan^{-1}\left(\frac{b}{a}\right)
+                \]
+            \end{infobox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Complex Arithmetic
+% -----------------------------------------------------------------------------
+\begin{frame}{Complex Arithmetic}
+    Let $z_1 = a + bi$ and $z_2 = c + di$
+    
+    \vspace{0.3cm}
+    
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{defbox}[Addition]
+                \[
+                    z_1 + z_2 = (a+c) + (b+d)i
+                \]
+                
+                Just add real and imaginary parts separately!
+            \end{defbox}
+            
+            \vspace{0.3cm}
+            
+            \begin{defbox}[Subtraction]
+                \[
+                    z_1 - z_2 = (a-c) + (b-d)i
+                \]
+            \end{defbox}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{defbox}[Multiplication]
+                \begin{align*}
+                    z_1 \cdot z_2 &= (a+bi)(c+di) \\
+                    &= ac + adi + bci + bdi^2 \\
+                    &= (ac - bd) + (ad + bc)i
+                \end{align*}
+                
+                Remember: $i^2 = -1$
+            \end{defbox}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.3cm}
+    
+    \textbf{Example:} $(2 + 3i)(1 - i) = 2 - 2i + 3i - 3i^2 = 2 + i + 3 = 5 + i$
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Euler's Formula
+% -----------------------------------------------------------------------------
+\begin{frame}{Euler's Formula: The Most Beautiful Equation}
+    \begin{thmbox}[Euler's Formula]
+        \[
+            \mathbf{e^{i\theta} = \cos\theta + i\sin\theta}
+        \]
+    \end{thmbox}
+    
+    \vspace{0.3cm}
+    
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.85]
+                % Unit circle
+                \draw[accentcyan,thick] (0,0) circle (1.5cm);
+                \draw[<->,thick,softgray] (-2,0) -- (2,0) node[right] {Re};
+                \draw[<->,thick,softgray] (0,-2) -- (0,2) node[above] {Im};
+                
+                % Point on circle
+                \coordinate (P) at (60:1.5);
+                \fill[neonpink] (P) circle (3pt);
+                \draw[neonpink,thick,->] (0,0) -- (P);
+                
+                % Angle
+                \draw[neonyellow,thick] (0.4,0) arc (0:60:0.4);
+                \node[neonyellow,font=\small] at (0.6,0.25) {$\theta$};
+                
+                % Projections
+                \draw[neongreen,dashed] (P) -- (60:1.5 |- 0,0);
+                \draw[accentcyan,dashed] (P) -- (0,0 |- P);
+                
+                \node[below,neongreen,font=\small] at (0.75,0) {$\cos\theta$};
+                \node[left,accentcyan,font=\small] at (0,1) {$\sin\theta$};
+                
+                \node[neonpink,above right] at (P) {$e^{i\theta}$};
+            \end{tikzpicture}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            When $\theta = \pi$:
+            \[
+                e^{i\pi} = \cos\pi + i\sin\pi = -1
+            \]
+            
+            \begin{keybox}[Euler's Identity]
+                \[
+                    \mathbf{e^{i\pi} + 1 = 0}
+                \]
+                
+                Links five fundamental constants:
+                \begin{itemize}
+                    \item $e$ (natural base)
+                    \item $i$ (imaginary unit)
+                    \item $\pi$ (pi)
+                    \item $1$ (multiplicative identity)
+                    \item $0$ (additive identity)
+                \end{itemize}
+            \end{keybox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Why Complex Numbers Matter
+% -----------------------------------------------------------------------------
+\begin{frame}{Why Complex Numbers Matter in ML}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{infobox}[Applications]
+                \begin{itemize}
+                    \item \textbf{Fourier Transforms}
+                    \begin{itemize}
+                        \item Signal processing
+                        \item Audio/image analysis
+                    \end{itemize}
+                    \item \textbf{Quantum Computing}
+                    \begin{itemize}
+                        \item Quantum states use $\mathbb{C}$
+                    \end{itemize}
+                    \item \textbf{Eigenvalues}
+                    \begin{itemize}
+                        \item Can be complex!
+                        \item PCA, neural network analysis
+                    \end{itemize}
+                    \item \textbf{Rotations}
+                    \begin{itemize}
+                        \item Complex multiplication = rotation
+                    \end{itemize}
+                \end{itemize}
+            \end{infobox}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.8]
+                % Show multiplication as rotation
+                \draw[softgray] (0,0) circle (2cm);
+                \draw[<->,softgray] (-2.5,0) -- (2.5,0);
+                \draw[<->,softgray] (0,-2.5) -- (0,2.5);
+                
+                % Original vector
+                \draw[accentcyan,thick,->] (0,0) -- (2,0);
+                \node[accentcyan,below] at (2,0) {$z$};
+                
+                % Rotated vector
+                \draw[neonpink,thick,->] (0,0) -- (1.414,1.414);
+                \node[neonpink,above right] at (1.414,1.414) {$z \cdot i$};
+                
+                % Angle
+                \draw[neonyellow] (0.5,0) arc (0:45:0.5);
+                \node[neonyellow,font=\small] at (0.8,0.3) {$90°$};
+            \end{tikzpicture}
+            
+            \vspace{0.3cm}
+            
+            \begin{funnybox}
+                Multiplying by $i$ rotates by 90°!
+                
+                Complex numbers = rotation superpowers!
+            \end{funnybox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Complete Number Hierarchy
+% -----------------------------------------------------------------------------
+\begin{frame}{The Complete Number Hierarchy}
+    \centering
+    \begin{tikzpicture}[scale=0.85]
+        % Nested sets
+        \fill[neonblue!10] (0,0) ellipse (6cm and 3.5cm);
+        \fill[neonpink!10] (0,0) ellipse (4.5cm and 2.7cm);
+        \fill[accentcyan!15] (0,0) ellipse (3.2cm and 2cm);
+        \fill[neonyellow!15] (0,0) ellipse (2cm and 1.3cm);
+        \fill[neongreen!20] (0,0) ellipse (0.9cm and 0.6cm);
+        
+        \draw[neonblue,thick] (0,0) ellipse (6cm and 3.5cm);
+        \draw[neonpink,thick] (0,0) ellipse (4.5cm and 2.7cm);
+        \draw[accentcyan,thick] (0,0) ellipse (3.2cm and 2cm);
+        \draw[neonyellow,thick] (0,0) ellipse (2cm and 1.3cm);
+        \draw[neongreen,thick] (0,0) ellipse (0.9cm and 0.6cm);
+        
+        % Labels
+        \node[neongreen,font=\bfseries] at (0,0) {$\mathbb{N}$};
+        \node[neonyellow,font=\bfseries] at (0,-1) {$\mathbb{Z}$};
+        \node[accentcyan,font=\bfseries] at (0,-1.7) {$\mathbb{Q}$};
+        \node[neonpink,font=\bfseries] at (0,-2.4) {$\mathbb{R}$};
+        \node[neonblue,font=\bfseries] at (0,-3.2) {$\mathbb{C}$};
+        
+        % Side annotations
+        \node[neongreen,right,font=\small] at (1.1,0) {$1, 2, 3, ...$};
+        \node[neonyellow,right,font=\small] at (2.2,-0.3) {$..., -1, 0, 1, ...$};
+        \node[accentcyan,right,font=\small] at (3.4,-0.8) {$\frac{p}{q}$};
+        \node[neonpink,right,font=\small] at (4.7,-1.3) {$\sqrt{2}, \pi, e$};
+        \node[neonblue,right,font=\small] at (6.2,-1.8) {$a + bi$};
+    \end{tikzpicture}
+    
+    \vspace{0.3cm}
+    
+    \[
+        \mathbb{N} \subset \mathbb{Z} \subset \mathbb{Q} \subset \mathbb{R} \subset \mathbb{C}
+    \]
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Key Takeaways
+% -----------------------------------------------------------------------------
+\begin{frame}{Key Takeaways: Real \& Complex Numbers}
+    \begin{keybox}
+        \begin{enumerate}
+            \item \textbf{Irrational numbers} ($\sqrt{2}, \pi, e$) cannot be written as fractions
+            \item \textbf{Real numbers} $\mathbb{R}$ = rationals + irrationals (complete number line)
+            \item \textbf{Complex numbers} $\mathbb{C}$: $z = a + bi$ where $i^2 = -1$
+            \item \textbf{Euler's formula}: $e^{i\theta} = \cos\theta + i\sin\theta$
+            \item \textbf{Euler's identity}: $e^{i\pi} + 1 = 0$ (the most beautiful equation!)
+            \item Complex numbers enable:
+            \begin{itemize}
+                \item Fourier transforms (signal processing)
+                \item Quantum computing
+                \item Elegant rotations
+            \end{itemize}
+        \end{enumerate}
+    \end{keybox}
+    
+    \vspace{0.2cm}
+    
+    \centering
+    \textit{Next: Functions — the building blocks of everything!}
+\end{frame}

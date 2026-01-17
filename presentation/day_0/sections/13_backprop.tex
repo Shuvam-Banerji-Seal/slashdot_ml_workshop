@@ -1,0 +1,407 @@
+% =============================================================================
+% Section 13: Backpropagation
+% Computing gradients through the chain rule
+% =============================================================================
+
+\section{Backpropagation}
+
+% -----------------------------------------------------------------------------
+% Opening
+% -----------------------------------------------------------------------------
+\begin{frame}{Backpropagation: Learning from Mistakes}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{funnybox}
+                \textit{``Backprop is like tracing your steps back through a maze, but instead of finding where you went wrong, you're finding WHO is responsible for the mistake.''}
+            \end{funnybox}
+            
+            \vspace{0.3cm}
+            
+            \textbf{The Key Insight:}
+            \begin{itemize}
+                \item Forward: Compute predictions
+                \item Backward: Compute gradients
+                \item Chain rule does ALL the work!
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.7]
+                % Forward arrow
+                \draw[->,ultra thick,neongreen] (0,2) -- (4,2);
+                \node[neongreen,above] at (2,2) {Forward};
+                
+                % Network
+                \node[circle,draw=accentcyan,fill=darkgray] (x) at (0,0) {$x$};
+                \node[circle,draw=accentcyan,fill=darkgray] (h) at (2,0) {$h$};
+                \node[circle,draw=accentcyan,fill=darkgray] (y) at (4,0) {$\hat{y}$};
+                \node[circle,draw=neonpink,fill=darkgray] (L) at (6,0) {$\mathcal{L}$};
+                
+                \draw[->,thick] (x) -- (h);
+                \draw[->,thick] (h) -- (y);
+                \draw[->,thick] (y) -- (L);
+                
+                % Backward arrow
+                \draw[<-,ultra thick,neonpink] (0,-1.5) -- (4,-1.5);
+                \node[neonpink,below] at (2,-1.5) {Backward (gradients)};
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Gradient Descent Review
+% -----------------------------------------------------------------------------
+\begin{frame}{Gradient Descent: The Big Picture}
+    \begin{defbox}[Gradient Descent Update]
+        To minimize $J(\mathbf{W})$, update parameters:
+        \[
+            W_{new} = W_{old} - \eta \frac{\partial J}{\partial W}
+        \]
+        
+        where $\eta$ is the \glow{learning rate}.
+    \end{defbox}
+    
+    \vspace{0.3cm}
+    
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \begin{keybox}[We Need Gradients!]
+                \[
+                    \frac{\partial J}{\partial W^{[l]}}, \quad \frac{\partial J}{\partial \mathbf{b}^{[l]}}
+                \]
+                
+                For EVERY parameter in EVERY layer.
+                
+                How? \textbf{Backpropagation!}
+            \end{keybox}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.6]
+                \draw[->] (0,0) -- (4,0) node[right] {$w$};
+                \draw[->] (0,0) -- (0,3) node[above] {$J$};
+                
+                \draw[thick,accentcyan,domain=0.5:3.5,samples=50] 
+                    plot (\x, {0.5 + 1.2*(\x-2)*(\x-2)});
+                
+                % Current point with gradient
+                \fill[neonpink] (0.8,1.93) circle (3pt);
+                \draw[->,thick,neonyellow] (0.8,1.93) -- (1.5,1.2);
+                \node[neonpink,above,font=\small] at (0.8,2.1) {current};
+                \node[neonyellow,right,font=\small] at (1.4,1.4) {$-\eta \nabla J$};
+                
+                \fill[neongreen] (2,0.5) circle (3pt);
+                \node[neongreen,below,font=\small] at (2,0.3) {goal};
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Chain Rule
+% -----------------------------------------------------------------------------
+\begin{frame}{The Chain Rule: Heart of Backprop}
+    \begin{thmbox}[Chain Rule]
+        If $y = f(g(x))$, then:
+        \[
+            \frac{dy}{dx} = \frac{dy}{dg} \cdot \frac{dg}{dx}
+        \]
+        
+        \textit{Multiply the derivatives along the path!}
+    \end{thmbox}
+    
+    \vspace{0.3cm}
+    
+    \textbf{Example:} $y = (2x + 1)^2$
+    
+    Let $g = 2x + 1$, so $y = g^2$
+    
+    \begin{align*}
+        \frac{dy}{dg} &= 2g = 2(2x+1) \\
+        \frac{dg}{dx} &= 2 \\
+        \frac{dy}{dx} &= 2(2x+1) \cdot 2 = 4(2x+1)
+    \end{align*}
+    
+    \begin{funnybox}
+        Chain rule = ``blame propagation.'' Each step shares responsibility for the final error!
+    \end{funnybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Multivariate Chain Rule
+% -----------------------------------------------------------------------------
+\begin{frame}{Multivariate Chain Rule}
+    \begin{thmbox}[Multivariate Chain Rule]
+        If $L = L(y)$ and $y = y(x_1, x_2, \ldots, x_n)$:
+        \[
+            \frac{\partial L}{\partial x_i} = \frac{\partial L}{\partial y} \cdot \frac{\partial y}{\partial x_i}
+        \]
+        
+        If there are multiple paths from $x$ to $L$:
+        \[
+            \frac{\partial L}{\partial x} = \sum_{\text{all paths}} \frac{\partial L}{\partial y_j} \cdot \frac{\partial y_j}{\partial x}
+        \]
+    \end{thmbox}
+    
+    \centering
+    \begin{tikzpicture}[scale=0.8]
+        \node[circle,draw=neongreen,fill=darkgray] (x) at (0,0) {$x$};
+        \node[circle,draw=accentcyan,fill=darkgray] (y1) at (2,0.8) {$y_1$};
+        \node[circle,draw=accentcyan,fill=darkgray] (y2) at (2,-0.8) {$y_2$};
+        \node[circle,draw=neonpink,fill=darkgray] (L) at (4,0) {$L$};
+        
+        \draw[->,thick] (x) -- (y1) node[midway,above,font=\small] {$\frac{\partial y_1}{\partial x}$};
+        \draw[->,thick] (x) -- (y2) node[midway,below,font=\small] {$\frac{\partial y_2}{\partial x}$};
+        \draw[->,thick] (y1) -- (L) node[midway,above,font=\small] {$\frac{\partial L}{\partial y_1}$};
+        \draw[->,thick] (y2) -- (L) node[midway,below,font=\small] {$\frac{\partial L}{\partial y_2}$};
+    \end{tikzpicture}
+    
+    $\frac{\partial L}{\partial x} = \frac{\partial L}{\partial y_1} \frac{\partial y_1}{\partial x} + \frac{\partial L}{\partial y_2} \frac{\partial y_2}{\partial x}$
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Backprop Example Setup
+% -----------------------------------------------------------------------------
+\begin{frame}{Backprop Example: Setup}
+    \textbf{Simple network:} $x \to$ hidden $\to$ output $\to$ loss
+    
+    \vspace{0.2cm}
+    
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \textbf{Forward equations:}
+            \begin{align*}
+                z &= wx + b \\
+                a &= \sigma(z) = \frac{1}{1+e^{-z}} \\
+                \mathcal{L} &= (a - y)^2
+            \end{align*}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.7]
+                \node[circle,draw=neongreen,fill=darkgray] (x) at (0,0) {$x$};
+                \node[circle,draw=accentcyan,fill=darkgray] (z) at (2,0) {$z$};
+                \node[circle,draw=accentcyan,fill=darkgray] (a) at (4,0) {$a$};
+                \node[circle,draw=neonpink,fill=darkgray] (L) at (6,0) {$\mathcal{L}$};
+                
+                \draw[->,thick] (x) -- (z) node[midway,above,font=\small] {$w,b$};
+                \draw[->,thick] (z) -- (a) node[midway,above,font=\small] {$\sigma$};
+                \draw[->,thick] (a) -- (L) node[midway,above,font=\small] {MSE};
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.3cm}
+    
+    \begin{keybox}[Goal]
+        Compute: $\frac{\partial \mathcal{L}}{\partial w}$ and $\frac{\partial \mathcal{L}}{\partial b}$
+        
+        Then update: $w \leftarrow w - \eta \frac{\partial \mathcal{L}}{\partial w}$
+    \end{keybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Backprop Example Step 1
+% -----------------------------------------------------------------------------
+\begin{frame}{Backprop Step 1: Output Layer}
+    \textbf{Start at the end:} $\mathcal{L} = (a - y)^2$
+    
+    \vspace{0.3cm}
+    
+    \[
+        \frac{\partial \mathcal{L}}{\partial a} = 2(a - y)
+    \]
+    
+    \vspace{0.3cm}
+    
+    \centering
+    \begin{tikzpicture}[scale=0.8]
+        \node[circle,draw=accentcyan,fill=darkgray] (a) at (0,0) {$a$};
+        \node[circle,draw=neonpink,fill=darkgray] (L) at (3,0) {$\mathcal{L}$};
+        
+        \draw[->,thick,neongreen] (a) -- (L);
+        \draw[<-,thick,neonyellow,dashed] (a) to[bend left=30] node[above,font=\small] {$\frac{\partial \mathcal{L}}{\partial a} = 2(a-y)$} (L);
+    \end{tikzpicture}
+    
+    \vspace{0.3cm}
+    
+    \begin{infobox}
+        This gradient tells us: ``How much does $\mathcal{L}$ change if we nudge $a$?''
+        
+        If $a > y$: positive gradient (decrease $a$!)\\
+        If $a < y$: negative gradient (increase $a$!)
+    \end{infobox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Backprop Example Step 2
+% -----------------------------------------------------------------------------
+\begin{frame}{Backprop Step 2: Through Activation}
+    \textbf{Chain through sigmoid:} $a = \sigma(z)$
+    
+    \vspace{0.2cm}
+    
+    Sigmoid derivative: $\frac{da}{dz} = \sigma(z)(1 - \sigma(z)) = a(1-a)$
+    
+    \vspace{0.2cm}
+    
+    \[
+        \frac{\partial \mathcal{L}}{\partial z} = \frac{\partial \mathcal{L}}{\partial a} \cdot \frac{\partial a}{\partial z} = 2(a-y) \cdot a(1-a)
+    \]
+    
+    \vspace{0.2cm}
+    
+    \centering
+    \begin{tikzpicture}[scale=0.8]
+        \node[circle,draw=accentcyan,fill=darkgray] (z) at (0,0) {$z$};
+        \node[circle,draw=accentcyan,fill=darkgray] (a) at (3,0) {$a$};
+        \node[circle,draw=neonpink,fill=darkgray] (L) at (6,0) {$\mathcal{L}$};
+        
+        \draw[->,thick] (z) -- (a) node[midway,above,font=\small] {$\sigma$};
+        \draw[->,thick] (a) -- (L);
+        
+        \draw[<-,thick,neonyellow,dashed] (z) to[bend left=30] (a);
+        \node[above,neonyellow,font=\small] at (1.5,0.8) {$\times a(1-a)$};
+    \end{tikzpicture}
+    
+    \begin{keybox}
+        Multiply by local gradient $a(1-a)$ at each step!
+    \end{keybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Backprop Example Step 3
+% -----------------------------------------------------------------------------
+\begin{frame}{Backprop Step 3: To Parameters}
+    \textbf{Final step:} $z = wx + b$
+    
+    \vspace{0.3cm}
+    
+    \begin{align*}
+        \frac{\partial z}{\partial w} &= x \\[0.5em]
+        \frac{\partial z}{\partial b} &= 1
+    \end{align*}
+    
+    \vspace{0.3cm}
+    
+    \textbf{Full gradients:}
+    \[
+        \boxed{\frac{\partial \mathcal{L}}{\partial w} = \frac{\partial \mathcal{L}}{\partial z} \cdot x = 2(a-y) \cdot a(1-a) \cdot x}
+    \]
+    
+    \[
+        \boxed{\frac{\partial \mathcal{L}}{\partial b} = \frac{\partial \mathcal{L}}{\partial z} \cdot 1 = 2(a-y) \cdot a(1-a)}
+    \]
+    
+    \begin{successbox}
+        Done! We can now update $w$ and $b$ using gradient descent.
+    \end{successbox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% General Backprop Algorithm
+% -----------------------------------------------------------------------------
+\begin{frame}{General Backprop Algorithm}
+    \begin{keybox}[Backpropagation for $L$ Layers]
+        \textbf{Initialize:} $\delta^{[L]} = \nabla_a \mathcal{L} \odot \sigma'(\mathbf{z}^{[L]})$
+        
+        \textbf{For} $l = L, L-1, \ldots, 1$:
+        \begin{align*}
+            \frac{\partial \mathcal{L}}{\partial W^{[l]}} &= \delta^{[l]} (\mathbf{a}^{[l-1]})^T \\[0.5em]
+            \frac{\partial \mathcal{L}}{\partial \mathbf{b}^{[l]}} &= \delta^{[l]} \\[0.5em]
+            \delta^{[l-1]} &= (W^{[l]})^T \delta^{[l]} \odot \sigma'(\mathbf{z}^{[l-1]})
+        \end{align*}
+    \end{keybox}
+    
+    \vspace{0.2cm}
+    
+    \begin{funnybox}
+        $\delta^{[l]}$ = ``error signal'' at layer $l$
+        
+        It flows backward, getting transformed at each layer!
+    \end{funnybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Computational Efficiency
+% -----------------------------------------------------------------------------
+\begin{frame}{Why Backprop is Efficient}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{alertbox}[Naive Approach]
+                Compute $\frac{\partial \mathcal{L}}{\partial w}$ separately for each weight.
+                
+                \textbf{Cost:} $O(W \cdot N)$ forward passes
+                
+                For 1M weights: 1 million forward passes!
+            \end{alertbox}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{successbox}[Backprop]
+                One forward + one backward pass.
+                
+                \textbf{Cost:} $O(2)$ passes total
+                
+                Same cost regardless of \# weights!
+            \end{successbox}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.5cm}
+    
+    \begin{keybox}
+        Backprop reuses intermediate computations!
+        
+        The ``error'' $\delta^{[l]}$ computed once serves all weights in that layer.
+    \end{keybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Automatic Differentiation
+% -----------------------------------------------------------------------------
+\begin{frame}{Automatic Differentiation in Practice}
+    \begin{infobox}[PyTorch Does It For You!]
+        PyTorch (and other frameworks) compute gradients automatically.
+    \end{infobox}
+    
+    \vspace{0.2cm}
+    
+    {\small\ttfamily
+    import torch\\[0.3em]
+    x = torch.tensor([0.5, 0.8, -0.3], requires\_grad=True)\\
+    w = torch.tensor([0.2, 0.4, -0.5], requires\_grad=True)\\
+    b = torch.tensor(0.1, requires\_grad=True)\\[0.3em]
+    z = torch.dot(w, x) + b\\
+    a = torch.sigmoid(z)\\
+    y\_true = torch.tensor(1.0)\\
+    loss = (a - y\_true) ** 2\\[0.3em]
+    loss.backward() \quad \# Backward pass - ONE LINE!\\[0.3em]
+    print(w.grad) \quad \# dL/dw for each component
+    }
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Key Takeaways
+% -----------------------------------------------------------------------------
+\begin{frame}{Key Takeaways: Backpropagation}
+    \begin{keybox}
+        \begin{enumerate}
+            \item \textbf{Backprop} computes $\frac{\partial \mathcal{L}}{\partial W}$ for all parameters
+            \item \textbf{Chain rule} is the key: multiply local gradients
+            \item Flow: Start at loss, work backward through network
+            \item Error signal $\delta^{[l]}$ propagates backward
+            \item \textbf{Efficient}: $O(1)$ passes, not $O(\text{params})$
+            \item \textbf{Frameworks handle it}: \texttt{loss.backward()} does everything!
+            \item Key derivatives to know:
+            \begin{itemize}
+                \item Sigmoid: $\sigma'(z) = \sigma(z)(1-\sigma(z))$
+                \item ReLU: $\text{ReLU}'(z) = \mathbf{1}_{z > 0}$
+                \item MSE: $\frac{\partial}{\partial \hat{y}}(\hat{y}-y)^2 = 2(\hat{y}-y)$
+            \end{itemize}
+        \end{enumerate}
+    \end{keybox}
+    
+    \centering
+    \textit{Next: Using gradients to optimize — Training algorithms!}
+\end{frame}

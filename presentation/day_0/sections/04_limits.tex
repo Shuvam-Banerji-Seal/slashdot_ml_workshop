@@ -1,0 +1,510 @@
+% =============================================================================
+% Section 4: Limits
+% The foundation of calculus - getting infinitely close
+% =============================================================================
+
+\section{Limits}
+
+% -----------------------------------------------------------------------------
+% Opening
+% -----------------------------------------------------------------------------
+\begin{frame}{Limits: Getting Infinitely Close}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{funnybox}
+                \textit{``A limit is like trying to touch your nose with your tongue — you can get really, really close, but maybe never quite there!''}
+            \end{funnybox}
+            
+            \vspace{0.3cm}
+            
+            \textbf{The Big Question:}
+            
+            What happens to $f(x)$ as $x$ gets \glow{infinitely close} to some value $a$?
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.8]
+                \draw[<->,thick,softgray] (-0.5,0) -- (4,0) node[right] {$x$};
+                \draw[<->,thick,softgray] (0,-0.5) -- (0,3) node[above] {$y$};
+                
+                % Function with hole
+                \draw[accentcyan,thick,domain=0:1.8,smooth] plot (\x,{0.5*\x + 0.5});
+                \draw[accentcyan,thick,domain=2.2:3.5,smooth] plot (\x,{0.5*\x + 0.5});
+                
+                % Hole at x=2
+                \draw[neonpink,thick] (2,1.5) circle (4pt);
+                
+                % Approaching arrows
+                \draw[->,neonyellow,thick] (1.3,0) -- (1.8,0);
+                \draw[->,neonyellow,thick] (2.7,0) -- (2.2,0);
+                
+                % Labels
+                \node[below,fgwhite] at (2,0) {$a$};
+                \node[right,neonpink] at (2.3,1.5) {$L$};
+                
+                \node[neonyellow,font=\small] at (2,-0.7) {approaching from both sides};
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Intuitive Definition
+% -----------------------------------------------------------------------------
+\begin{frame}{Intuitive Definition of Limits}
+    \begin{defbox}[Informal Limit Definition]
+        We write:
+        \[
+            \lim_{x \to a} f(x) = L
+        \]
+        
+        and say ``the limit of $f(x)$ as $x$ approaches $a$ equals $L$''
+        
+        \vspace{0.2cm}
+        
+        \textbf{Meaning:} As $x$ gets closer and closer to $a$, $f(x)$ gets closer and closer to $L$.
+    \end{defbox}
+    
+    \vspace{0.3cm}
+    
+    \textbf{Example:} $\displaystyle\lim_{x \to 2} (3x + 1) = ?$
+    
+    \begin{center}
+        \begin{tabular}{c|cccccc}
+            $x$ & 1.9 & 1.99 & 1.999 & 2.001 & 2.01 & 2.1 \\
+            \hline
+            $f(x)$ & 6.7 & 6.97 & 6.997 & 7.003 & 7.03 & 7.3
+        \end{tabular}
+    \end{center}
+    
+    As $x \to 2$, we have $f(x) \to \glow{7}$!
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Epsilon-Delta Definition
+% -----------------------------------------------------------------------------
+\begin{frame}{The Rigorous Definition: Epsilon-Delta}
+    \begin{thmbox}[Epsilon-Delta Definition]
+        \[
+            \lim_{x \to a} f(x) = L
+        \]
+        
+        means: For every $\glow[neongreen]{\varepsilon > 0}$, there exists $\glow[neonpink]{\delta > 0}$ such that:
+        \[
+            0 < |x - a| < \delta \implies |f(x) - L| < \varepsilon
+        \]
+    \end{thmbox}
+    
+    \vspace{0.3cm}
+    
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \textbf{In English:}
+            \begin{itemize}
+                \item Pick any tolerance $\varepsilon$ (how close to $L$)
+                \item I can find a $\delta$ (how close $x$ needs to be to $a$)
+                \item Such that staying within $\delta$ of $a$ keeps $f(x)$ within $\varepsilon$ of $L$
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{funnybox}
+                It's like a game:
+                
+                \vspace{0.1cm}
+                
+                You: ``Get within $\varepsilon$ of $L$!''
+                
+                Me: ``Fine, stay within $\delta$ of $a$.''
+                
+                \vspace{0.1cm}
+                
+                If I can \textit{always} win, the limit exists!
+            \end{funnybox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Epsilon-Delta Visualization
+% -----------------------------------------------------------------------------
+\begin{frame}{Visualizing $\varepsilon$-$\delta$}
+    \centering
+    \begin{tikzpicture}[scale=0.95]
+        % Axes
+        \draw[<->,thick,softgray] (-0.5,0) -- (5,0) node[right] {$x$};
+        \draw[<->,thick,softgray] (0,-0.5) -- (0,3.5) node[above] {$y$};
+        
+        % Function
+        \draw[accentcyan,thick,domain=0.5:4.5,smooth] plot (\x,{0.5*\x + 0.5});
+        
+        % Point a on x-axis
+        \fill[fgwhite] (2.5,0) circle (2pt);
+        \node[below,fgwhite] at (2.5,-0.1) {$a$};
+        
+        % L on y-axis  
+        \fill[fgwhite] (0,1.75) circle (2pt);
+        \node[left,fgwhite] at (0,1.75) {$L$};
+        
+        % Epsilon band (horizontal)
+        \fill[neongreen,opacity=0.2] (0,1.45) rectangle (5,2.05);
+        \draw[neongreen,dashed] (0,2.05) -- (5,2.05);
+        \draw[neongreen,dashed] (0,1.45) -- (5,1.45);
+        \node[left,neongreen,font=\small] at (0,2.05) {$L+\varepsilon$};
+        \node[left,neongreen,font=\small] at (0,1.45) {$L-\varepsilon$};
+        
+        % Delta band (vertical)
+        \fill[neonpink,opacity=0.2] (1.9,0) rectangle (3.1,3.5);
+        \draw[neonpink,dashed] (1.9,0) -- (1.9,3.5);
+        \draw[neonpink,dashed] (3.1,0) -- (3.1,3.5);
+        \node[below,neonpink,font=\small] at (1.9,0) {$a-\delta$};
+        \node[below,neonpink,font=\small] at (3.1,0) {$a+\delta$};
+        
+        % Arrows showing the constraint
+        \draw[<->,neonyellow,thick] (2.5,1.45) -- (2.5,2.05);
+        \node[right,neonyellow,font=\small] at (2.5,1.75) {$\varepsilon$};
+        
+        \draw[<->,neonyellow,thick] (1.9,-0.4) -- (3.1,-0.4);
+        \node[below,neonyellow,font=\small] at (2.5,-0.4) {$\delta$};
+    \end{tikzpicture}
+    
+    \vspace{0.2cm}
+    
+    If $x$ is in the \textcolor{neonpink}{pink zone}, $f(x)$ stays in the \textcolor{neongreen}{green zone}!
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Limit Laws
+% -----------------------------------------------------------------------------
+\begin{frame}{Limit Laws: The Algebra of Limits}
+    If $\displaystyle\lim_{x \to a} f(x) = L$ and $\displaystyle\lim_{x \to a} g(x) = M$, then:
+    
+    \vspace{0.3cm}
+    
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{defbox}[Addition]
+                \[
+                    \lim_{x \to a} [f(x) + g(x)] = L + M
+                \]
+            \end{defbox}
+            
+            \vspace{0.2cm}
+            
+            \begin{defbox}[Multiplication]
+                \[
+                    \lim_{x \to a} [f(x) \cdot g(x)] = L \cdot M
+                \]
+            \end{defbox}
+            
+            \vspace{0.2cm}
+            
+            \begin{defbox}[Constant Multiple]
+                \[
+                    \lim_{x \to a} [c \cdot f(x)] = c \cdot L
+                \]
+            \end{defbox}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{defbox}[Subtraction]
+                \[
+                    \lim_{x \to a} [f(x) - g(x)] = L - M
+                \]
+            \end{defbox}
+            
+            \vspace{0.2cm}
+            
+            \begin{defbox}[Division]
+                \[
+                    \lim_{x \to a} \frac{f(x)}{g(x)} = \frac{L}{M} \quad (M \neq 0)
+                \]
+            \end{defbox}
+            
+            \vspace{0.2cm}
+            
+            \begin{defbox}[Power]
+                \[
+                    \lim_{x \to a} [f(x)]^n = L^n
+                \]
+            \end{defbox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% One-Sided Limits
+% -----------------------------------------------------------------------------
+\begin{frame}{One-Sided Limits}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{defbox}[Left-Hand Limit]
+                \[
+                    \lim_{x \to a^-} f(x) = L
+                \]
+                
+                Approaching from the \textbf{left} (values less than $a$)
+            \end{defbox}
+            
+            \vspace{0.3cm}
+            
+            \begin{defbox}[Right-Hand Limit]
+                \[
+                    \lim_{x \to a^+} f(x) = L
+                \]
+                
+                Approaching from the \textbf{right} (values greater than $a$)
+            \end{defbox}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.8]
+                \draw[<->,thick,softgray] (-0.5,0) -- (4,0) node[right] {$x$};
+                \draw[<->,thick,softgray] (0,-0.5) -- (0,3) node[above] {$y$};
+                
+                % Jump discontinuity
+                \draw[accentcyan,thick,domain=0.3:1.9] plot (\x,{0.5*\x + 0.5});
+                \draw[neonpink,thick,domain=2.1:3.5] plot (\x,{0.5*\x + 1.2});
+                
+                % Points
+                \fill[accentcyan] (2,1.5) circle (3pt);
+                \draw[neonpink,thick] (2,2.2) circle (3pt);
+                
+                % Labels
+                \node[below,fgwhite] at (2,0) {$a$};
+                \node[left,accentcyan,font=\small] at (1.5,1.2) {$\lim_{x\to a^-}$};
+                \node[right,neonpink,font=\small] at (2.5,2.5) {$\lim_{x\to a^+}$};
+            \end{tikzpicture}
+            
+            \vspace{0.2cm}
+            
+            \begin{alertbox}
+                Limit exists $\iff$ both one-sided limits exist and are equal!
+            \end{alertbox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Limits at Infinity
+% -----------------------------------------------------------------------------
+\begin{frame}{Limits at Infinity}
+    \begin{defbox}[Limit at Infinity]
+        \[
+            \lim_{x \to \infty} f(x) = L
+        \]
+        
+        As $x$ grows without bound, $f(x)$ approaches $L$.
+    \end{defbox}
+    
+    \vspace{0.3cm}
+    
+    \textbf{Examples:}
+    
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \[
+                \lim_{x \to \infty} \frac{1}{x} = 0
+            \]
+            
+            \centering
+            \begin{tikzpicture}[scale=0.5]
+                \draw[<->,thick,softgray] (-0.5,0) -- (4,0);
+                \draw[<->,thick,softgray] (0,-0.5) -- (0,3);
+                \draw[accentcyan,thick,domain=0.4:3.8,smooth] plot (\x,{1/\x});
+                \draw[neonpink,dashed] (0,0) -- (4,0);
+            \end{tikzpicture}
+            
+            {\small Horizontal asymptote at $y = 0$}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \[
+                \lim_{x \to \infty} \frac{2x + 1}{x} = 2
+            \]
+            
+            \centering
+            \begin{tikzpicture}[scale=0.5]
+                \draw[<->,thick,softgray] (-0.5,0) -- (4,0);
+                \draw[<->,thick,softgray] (0,-0.5) -- (0,3);
+                \draw[accentcyan,thick,domain=0.4:3.8,smooth] plot (\x,{(2*\x+1)/\x});
+                \draw[neonpink,dashed] (0,2) -- (4,2);
+            \end{tikzpicture}
+            
+            {\small Horizontal asymptote at $y = 2$}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Indeterminate Forms
+% -----------------------------------------------------------------------------
+\begin{frame}{Indeterminate Forms}
+    \begin{alertbox}[Danger Zone!]
+        Some limits look like they give answers but don't:
+        
+        \vspace{0.2cm}
+        
+        \centering
+        \begin{tabular}{ccccccc}
+            $\frac{0}{0}$ & $\frac{\infty}{\infty}$ & $0 \cdot \infty$ & $\infty - \infty$ & $0^0$ & $1^\infty$ & $\infty^0$
+        \end{tabular}
+        
+        \vspace{0.2cm}
+        
+        These are \glow[neonpink]{indeterminate} — they need more work!
+    \end{alertbox}
+    
+    \vspace{0.3cm}
+    
+    \textbf{Example:} $\displaystyle\lim_{x \to 0} \frac{\sin x}{x} = \frac{0}{0}$ ??? 
+    
+    \vspace{0.2cm}
+    
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            But actually:
+            \[
+                \lim_{x \to 0} \frac{\sin x}{x} = 1
+            \]
+            (This is a famous result!)
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{funnybox}
+                $\frac{0}{0}$ doesn't mean ``zero'' — it means ``figure it out another way!''
+            \end{funnybox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% L'Hôpital's Rule Preview
+% -----------------------------------------------------------------------------
+\begin{frame}{L'Hôpital's Rule (Preview)}
+    \begin{thmbox}[L'Hôpital's Rule]
+        If $\displaystyle\lim_{x \to a} \frac{f(x)}{g(x)}$ gives $\frac{0}{0}$ or $\frac{\infty}{\infty}$, then:
+        \[
+            \lim_{x \to a} \frac{f(x)}{g(x)} = \lim_{x \to a} \frac{f'(x)}{g'(x)}
+        \]
+        
+        (provided the right-hand limit exists)
+    \end{thmbox}
+    
+    \vspace{0.3cm}
+    
+    \textbf{Example:} $\displaystyle\lim_{x \to 0} \frac{\sin x}{x}$
+    
+    \begin{itemize}
+        \item Direct: $\frac{\sin 0}{0} = \frac{0}{0}$ (indeterminate!)
+        \item L'Hôpital: $\displaystyle\lim_{x \to 0} \frac{\cos x}{1} = \frac{\cos 0}{1} = 1$ (YES)
+    \end{itemize}
+    
+    \begin{infobox}
+        We'll learn about derivatives ($f'$) in the next section — then L'Hôpital makes sense!
+    \end{infobox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Continuity
+% -----------------------------------------------------------------------------
+\begin{frame}{Continuity: No Jumps, No Holes}
+    \begin{defbox}[Continuous Function]
+        A function $f$ is \glow{continuous} at $x = a$ if:
+        \[
+            \lim_{x \to a} f(x) = f(a)
+        \]
+        
+        \textbf{Three conditions:}
+        \begin{enumerate}
+            \item $f(a)$ exists (defined at $a$)
+            \item $\lim_{x \to a} f(x)$ exists
+            \item They're equal!
+        \end{enumerate}
+    \end{defbox}
+    
+    \vspace{0.3cm}
+    
+    \begin{columns}
+        \begin{column}{0.33\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.5]
+                \draw[softgray] (-1,0) -- (2,0);
+                \draw[softgray] (0,-0.5) -- (0,2);
+                \draw[accentcyan,thick,domain=-0.8:1.8,smooth] plot (\x,{\x+0.5});
+                \node[below,fgwhite,font=\tiny] at (0.5,-0.5) {Continuous (YES)};
+            \end{tikzpicture}
+        \end{column}
+        \begin{column}{0.33\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.5]
+                \draw[softgray] (-1,0) -- (2,0);
+                \draw[softgray] (0,-0.5) -- (0,2);
+                \draw[neonpink,thick,domain=-0.8:0.4] plot (\x,{\x+0.5});
+                \draw[neonpink,thick,domain=0.6:1.8] plot (\x,{\x+1});
+                \draw[neonpink] (0.5,1) circle (3pt);
+                \fill[neonpink] (0.5,1.5) circle (3pt);
+                \node[below,fgwhite,font=\tiny] at (0.5,-0.5) {Jump (NO)};
+            \end{tikzpicture}
+        \end{column}
+        \begin{column}{0.33\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.5]
+                \draw[softgray] (-1,0) -- (2,0);
+                \draw[softgray] (0,-0.5) -- (0,2);
+                \draw[neonyellow,thick,domain=-0.8:0.4] plot (\x,{\x+0.5});
+                \draw[neonyellow,thick,domain=0.6:1.8] plot (\x,{\x+0.5});
+                \draw[neonyellow] (0.5,1) circle (3pt);
+                \node[below,fgwhite,font=\tiny] at (0.5,-0.5) {Hole (NO)};
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Why Limits Matter in ML
+% -----------------------------------------------------------------------------
+\begin{frame}{Why Limits Matter in Machine Learning}
+    \begin{keybox}[Applications in ML]
+        \begin{enumerate}
+            \item \textbf{Derivatives} (next section!) are defined using limits
+            \begin{itemize}
+                \item Gradients for backpropagation!
+            \end{itemize}
+            
+            \item \textbf{Convergence of training}
+            \begin{itemize}
+                \item Does the loss approach a minimum?
+            \end{itemize}
+            
+            \item \textbf{Asymptotic analysis}
+            \begin{itemize}
+                \item Algorithm complexity: $O(n)$, $O(n^2)$
+            \end{itemize}
+            
+            \item \textbf{Activation functions}
+            \begin{itemize}
+                \item $\lim_{x \to \infty} \sigma(x) = 1$ (sigmoid saturation)
+            \end{itemize}
+        \end{enumerate}
+    \end{keybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Key Takeaways
+% -----------------------------------------------------------------------------
+\begin{frame}{Key Takeaways: Limits}
+    \begin{keybox}
+        \begin{enumerate}
+            \item \textbf{Limit}: What $f(x)$ approaches as $x \to a$
+            \item \textbf{Notation}: $\lim_{x \to a} f(x) = L$
+            \item \textbf{$\varepsilon$-$\delta$ definition}: The rigorous foundation
+            \item \textbf{Limit laws}: Add, subtract, multiply, divide limits
+            \item \textbf{One-sided limits}: From left ($a^-$) or right ($a^+$)
+            \item \textbf{Limits at infinity}: Behavior as $x \to \pm\infty$
+            \item \textbf{Indeterminate forms}: $\frac{0}{0}$, $\frac{\infty}{\infty}$, etc. need special handling
+            \item \textbf{Continuity}: No jumps, no holes, no surprises
+        \end{enumerate}
+    \end{keybox}
+    
+    \vspace{0.2cm}
+    
+    \centering
+    \textit{Next: Differentiation — the heart of calculus!}
+\end{frame}

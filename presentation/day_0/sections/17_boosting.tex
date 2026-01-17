@@ -1,0 +1,362 @@
+% =============================================================================
+% Section 17: Ensemble Methods & Boosting
+% Random Forests, Bagging, AdaBoost, Gradient Boosting
+% =============================================================================
+
+\section{Ensemble Methods \& Boosting}
+
+% -----------------------------------------------------------------------------
+% Opening
+% -----------------------------------------------------------------------------
+\begin{frame}{Ensemble Methods: Wisdom of the Crowd}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{funnybox}
+                \textit{``One tree might be wrong, but a whole forest? Much harder to fool!''}
+            \end{funnybox}
+            
+            \vspace{0.3cm}
+            
+            \textbf{Core Idea:}
+            \begin{itemize}
+                \item Train multiple ``weak'' models
+                \item Combine their predictions
+                \item Get a ``strong'' model!
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.7]
+                % Multiple trees
+                \foreach \x in {0,1.5,3} {
+                    \begin{scope}[xshift=\x cm]
+                        \node[draw=accentcyan,rounded corners,fill=darkgray,minimum size=0.4cm] at (0,0) {};
+                        \draw[accentcyan] (-0.3,-0.5) -- (0,-0.3);
+                        \draw[accentcyan] (0.3,-0.5) -- (0,-0.3);
+                        \draw[accentcyan] (-0.5,-1) -- (-0.3,-0.5);
+                        \draw[accentcyan] (-0.1,-1) -- (-0.3,-0.5);
+                        \draw[accentcyan] (0.1,-1) -- (0.3,-0.5);
+                        \draw[accentcyan] (0.5,-1) -- (0.3,-0.5);
+                    \end{scope}
+                }
+                
+                % Voting
+                \draw[->,thick,neonyellow] (0.75,-1.3) -- (0.75,-2);
+                \draw[->,thick,neonyellow] (1.5,-1.3) -- (1.5,-2);
+                \draw[->,thick,neonyellow] (2.25,-1.3) -- (2.25,-2);
+                
+                % Combined prediction
+                \node[draw=neonpink,rounded corners,fill=darkgray,minimum width=2.5cm] at (1.5,-2.5) {Vote/Average};
+                
+                \draw[->,thick,neonyellow] (1.5,-3) -- (1.5,-3.5);
+                \node[neongreen,font=\small] at (1.5,-4) {Strong Prediction};
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Bagging
+% -----------------------------------------------------------------------------
+\begin{frame}{Bagging: Bootstrap Aggregating}
+    \begin{defbox}[Bagging (Breiman, 1996)]
+        \begin{enumerate}
+            \item Create $B$ bootstrap samples (sample with replacement)
+            \item Train one model on each bootstrap sample
+            \item Aggregate predictions:
+            \begin{itemize}
+                \item Classification: majority vote
+                \item Regression: average
+            \end{itemize}
+        \end{enumerate}
+    \end{defbox}
+    
+    \centering
+    \begin{tikzpicture}[scale=0.7]
+        % Original data
+        \node[draw=accentcyan,rounded corners,fill=darkgray] (data) at (0,0) {Data: $\{1,2,3,4,5\}$};
+        
+        % Bootstrap samples
+        \node[draw=neonpink,rounded corners,fill=darkgray,font=\small] (b1) at (-2.5,-1.5) {$\{1,1,3,4,5\}$};
+        \node[draw=neonpink,rounded corners,fill=darkgray,font=\small] (b2) at (0,-1.5) {$\{2,2,3,3,5\}$};
+        \node[draw=neonpink,rounded corners,fill=darkgray,font=\small] (b3) at (2.5,-1.5) {$\{1,3,4,5,5\}$};
+        
+        \draw[->,thick] (data) -- (b1);
+        \draw[->,thick] (data) -- (b2);
+        \draw[->,thick] (data) -- (b3);
+        
+        % Models
+        \node[draw=neongreen,rounded corners,fill=darkgray,font=\small] (m1) at (-2.5,-3) {Tree 1};
+        \node[draw=neongreen,rounded corners,fill=darkgray,font=\small] (m2) at (0,-3) {Tree 2};
+        \node[draw=neongreen,rounded corners,fill=darkgray,font=\small] (m3) at (2.5,-3) {Tree 3};
+        
+        \draw[->,thick] (b1) -- (m1);
+        \draw[->,thick] (b2) -- (m2);
+        \draw[->,thick] (b3) -- (m3);
+        
+        % Aggregate
+        \draw[->,thick] (m1) -- (0,-4);
+        \draw[->,thick] (m2) -- (0,-4);
+        \draw[->,thick] (m3) -- (0,-4);
+        \node[draw=neonyellow,rounded corners,fill=darkgray] at (0,-4.5) {Aggregate};
+    \end{tikzpicture}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Random Forest
+% -----------------------------------------------------------------------------
+\begin{frame}{Random Forest: Bagging + Feature Randomness}
+    \begin{defbox}[Random Forest (Breiman, 2001)]
+        Bagging + random feature selection at each split:
+        
+        \begin{itemize}
+            \item At each node, consider only $m$ random features
+            \item Typical $m$: $\sqrt{p}$ for classification, $p/3$ for regression
+            \item This \textbf{decorrelates} the trees!
+        \end{itemize}
+    \end{defbox}
+    
+    \vspace{0.2cm}
+    
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \begin{keybox}[Why Random Features?]
+                Without it:
+                \begin{itemize}
+                    \item All trees use same strong features
+                    \item Trees are correlated
+                    \item Averaging doesn't help much
+                \end{itemize}
+                
+                With it:
+                \begin{itemize}
+                    \item Trees are diverse
+                    \item Errors cancel out!
+                \end{itemize}
+            \end{keybox}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{infobox}[Hyperparameters]
+                \begin{itemize}
+                    \item \texttt{n\_estimators}: \# of trees
+                    \item \texttt{max\_features}: $m$
+                    \item \texttt{max\_depth}: Tree depth
+                    \item \texttt{min\_samples\_leaf}
+                \end{itemize}
+                
+                More trees = better (diminishing returns)
+            \end{infobox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Boosting Intuition
+% -----------------------------------------------------------------------------
+\begin{frame}{Boosting: Sequential Learning}
+    \begin{defbox}[Boosting Intuition]
+        Train models \textbf{sequentially}, each focusing on mistakes of previous ones.
+        
+        \centering
+        \begin{tikzpicture}[scale=0.7]
+            % Model 1
+            \node[draw=accentcyan,rounded corners,fill=darkgray] (m1) at (0,0) {Model 1};
+            \node[below,font=\small,fgwhite] at (0,-0.5) {Train on all data};
+            
+            % Errors
+            \draw[->,thick,neonpink] (1.5,0) -- (3,0) node[midway,above,font=\tiny] {errors};
+            
+            % Model 2
+            \node[draw=accentcyan,rounded corners,fill=darkgray] (m2) at (4.5,0) {Model 2};
+            \node[below,font=\small,fgwhite] at (4.5,-0.5) {Focus on errors};
+            
+            % More errors
+            \draw[->,thick,neonpink] (6,0) -- (7.5,0) node[midway,above,font=\tiny] {errors};
+            
+            % Model 3
+            \node[draw=accentcyan,rounded corners,fill=darkgray] (m3) at (9,0) {Model 3};
+            \node[below,font=\small,fgwhite] at (9,-0.5) {...};
+        \end{tikzpicture}
+    \end{defbox}
+    
+    \vspace{0.3cm}
+    
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \begin{keybox}[Bagging vs Boosting]
+                \textbf{Bagging}: Parallel, reduce variance
+                
+                \textbf{Boosting}: Sequential, reduce bias
+            \end{keybox}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{funnybox}
+                Boosting: ``You got this wrong? Let me send my friend who's good at exactly that!''
+            \end{funnybox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% AdaBoost
+% -----------------------------------------------------------------------------
+\begin{frame}{AdaBoost: Adaptive Boosting}
+    \begin{defbox}[AdaBoost (Freund \& Schapire, 1997)]
+        \begin{enumerate}
+            \item Initialize sample weights: $w_i = 1/N$
+            \item For $t = 1, \ldots, T$:
+            \begin{enumerate}
+                \item Train weak learner on weighted data
+                \item Compute weighted error: $\epsilon_t = \sum_{wrong} w_i$
+                \item Compute model weight: $\alpha_t = \frac{1}{2} \ln\left(\frac{1-\epsilon_t}{\epsilon_t}\right)$
+                \item Update sample weights: increase for wrong, decrease for correct
+            \end{enumerate}
+            \item Final: $H(x) = \text{sign}\left(\sum_t \alpha_t h_t(x)\right)$
+        \end{enumerate}
+    \end{defbox}
+    
+    \begin{keybox}
+        Better weak learners get higher $\alpha$. Misclassified samples get higher weight.
+    \end{keybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Gradient Boosting
+% -----------------------------------------------------------------------------
+\begin{frame}{Gradient Boosting: Boosting as Gradient Descent}
+    \begin{defbox}[Gradient Boosting]
+        Each new model fits the \textbf{residuals} (gradient of loss):
+        
+        \begin{enumerate}
+            \item Initialize: $F_0(x) = \arg\min_c \sum_i L(y_i, c)$
+            \item For $t = 1, \ldots, T$:
+            \begin{enumerate}
+                \item Compute residuals: $r_i = -\frac{\partial L(y_i, F_{t-1}(x_i))}{\partial F_{t-1}}$
+                \item Fit tree $h_t$ to residuals
+                \item Update: $F_t(x) = F_{t-1}(x) + \eta \cdot h_t(x)$
+            \end{enumerate}
+        \end{enumerate}
+    \end{defbox}
+    
+    \vspace{0.2cm}
+    
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \textbf{For MSE loss:}
+            
+            Residual = $y_i - F_{t-1}(x_i)$
+            
+            (actual minus prediction)
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{funnybox}
+                Each tree says: ``Here's how much you're off by. Let me fix that!''
+            \end{funnybox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% XGBoost
+% -----------------------------------------------------------------------------
+\begin{frame}{XGBoost: Gradient Boosting on Steroids}
+    \begin{defbox}[XGBoost (Chen \& Guestrin, 2016)]
+        Key improvements over vanilla gradient boosting:
+        
+        \begin{itemize}
+            \item \textbf{Regularized objective}: $L = \sum_i l(y_i, \hat{y}_i) + \sum_k \Omega(f_k)$
+            \item \textbf{Second-order approximation}: Uses Hessian
+            \item \textbf{Efficient implementation}: Parallel, cache-aware
+            \item \textbf{Handling missing values}: Built-in
+            \item \textbf{Column subsampling}: Like random forest
+        \end{itemize}
+    \end{defbox}
+    
+    \vspace{0.2cm}
+    
+    \begin{successbox}
+        XGBoost often wins Kaggle competitions!
+        
+        Also: \textbf{LightGBM} (Microsoft) and \textbf{CatBoost} (Yandex) are popular alternatives.
+    \end{successbox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Comparison
+% -----------------------------------------------------------------------------
+\begin{frame}{Ensemble Methods Comparison}
+    \centering
+    \begin{tabular}{lccc}
+        & \textbf{Random Forest} & \textbf{AdaBoost} & \textbf{XGBoost} \\
+        \hline
+        Training & Parallel & Sequential & Sequential \\
+        Reduces & Variance & Bias & Both \\
+        Overfitting & Robust & Can overfit & Regularized \\
+        Tuning & Easy & Medium & Complex \\
+        Interpretable & Somewhat & Somewhat & Less \\
+        Speed & Fast & Medium & Fast \\
+    \end{tabular}
+    
+    \vspace{0.5cm}
+    
+    \begin{keybox}[Rules of Thumb]
+        \begin{itemize}
+            \item \textbf{Start with}: Random Forest (robust, few hyperparams)
+            \item \textbf{For maximum performance}: XGBoost/LightGBM
+            \item \textbf{For interpretability}: Single tree (with pruning)
+        \end{itemize}
+    \end{keybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Code
+% -----------------------------------------------------------------------------
+\begin{frame}{Ensemble Methods in Python}
+    \begin{successbox}[Scikit-learn \& XGBoost]
+        {\small\ttfamily
+        from sklearn.ensemble import RandomForestClassifier\\
+        from sklearn.ensemble import GradientBoostingClassifier\\
+        import xgboost as xgb\\[0.3em]
+        \# Random Forest\\
+        rf = RandomForestClassifier(n\_estimators=100, max\_depth=10)\\
+        rf.fit(X\_train, y\_train)\\[0.3em]
+        \# Gradient Boosting\\
+        gb = GradientBoostingClassifier(n\_estimators=100,\\
+        \quad\quad\quad\quad\quad\quad\quad\quad\quad\quad learning\_rate=0.1)\\
+        gb.fit(X\_train, y\_train)\\[0.3em]
+        \# XGBoost\\
+        xgb\_model = xgb.XGBClassifier(n\_estimators=100,\\
+        \quad\quad\quad\quad\quad\quad\quad\quad\quad\quad learning\_rate=0.1, max\_depth=6)\\
+        xgb\_model.fit(X\_train, y\_train)
+        }
+    \end{successbox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Key Takeaways
+% -----------------------------------------------------------------------------
+\begin{frame}{Key Takeaways: Ensemble Methods}
+    \begin{keybox}
+        \begin{enumerate}
+            \item \textbf{Ensemble} = combine multiple weak learners
+            \item \textbf{Bagging}: Train in parallel on bootstrap samples
+            \begin{itemize}
+                \item Reduces variance
+            \end{itemize}
+            \item \textbf{Random Forest}: Bagging + random feature subsets
+            \begin{itemize}
+                \item Decorrelates trees
+            \end{itemize}
+            \item \textbf{Boosting}: Train sequentially, focus on errors
+            \begin{itemize}
+                \item Reduces bias
+            \end{itemize}
+            \item \textbf{AdaBoost}: Weight samples and models
+            \item \textbf{Gradient Boosting}: Fit residuals (gradients)
+            \item \textbf{XGBoost}: Regularized, efficient GB
+        \end{enumerate}
+    \end{keybox}
+    
+    \centering
+    \textit{Next: Statistical Learning Theory — why does any of this work?}
+\end{frame}

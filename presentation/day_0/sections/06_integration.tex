@@ -1,0 +1,508 @@
+% =============================================================================
+% Section 6: Integration
+% The inverse of differentiation - finding areas and totals
+% =============================================================================
+
+\section{Integration}
+
+% -----------------------------------------------------------------------------
+% Opening
+% -----------------------------------------------------------------------------
+\begin{frame}{Integration: Adding Infinitely Many Infinitely Small Pieces}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{funnybox}
+                \textit{``Integration is like eating pizza: one slice at a time, you can consume the whole thing. Except with integration, the slices are infinitely thin!''}
+            \end{funnybox}
+            
+            \vspace{0.3cm}
+            
+            \textbf{Two Big Ideas:}
+            \begin{enumerate}
+                \item Finding areas under curves
+                \item Reversing differentiation
+            \end{enumerate}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.8]
+                \draw[<->,thick,softgray] (-0.5,0) -- (4,0) node[right] {$x$};
+                \draw[<->,thick,softgray] (0,-0.5) -- (0,2.5) node[above] {$y$};
+                
+                % Fill area
+                \fill[accentcyan,opacity=0.3] (0.5,0) -- plot[domain=0.5:3.2,smooth] (\x,{0.3*\x*\x - 0.5*\x + 1}) -- (3.2,0) -- cycle;
+                
+                % Curve
+                \draw[accentcyan,thick,domain=0.3:3.5,smooth] plot (\x,{0.3*\x*\x - 0.5*\x + 1});
+                
+                % Boundaries
+                \draw[neonpink,dashed] (0.5,0) -- (0.5,0.825);
+                \draw[neonpink,dashed] (3.2,0) -- (3.2,2.468);
+                
+                \node[below,fgwhite] at (0.5,0) {$a$};
+                \node[below,fgwhite] at (3.2,0) {$b$};
+                \node[accentcyan] at (1.8,0.8) {Area};
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Riemann Sums
+% -----------------------------------------------------------------------------
+\begin{frame}{Riemann Sums: Approximating Area}
+    \centering
+    \begin{tikzpicture}[scale=0.9]
+        % Axes
+        \draw[<->,thick,softgray] (-0.5,0) -- (5,0) node[right] {$x$};
+        \draw[<->,thick,softgray] (0,-0.5) -- (0,3) node[above] {$y$};
+        
+        % Rectangles
+        \foreach \x in {0.5,1,1.5,2,2.5,3,3.5} {
+            \pgfmathsetmacro{\height}{0.2*\x*\x + 0.5}
+            \fill[neonyellow,opacity=0.4] (\x,0) rectangle (\x+0.5,\height);
+            \draw[neonyellow] (\x,0) rectangle (\x+0.5,\height);
+        }
+        
+        % Curve
+        \draw[accentcyan,thick,domain=0.3:4.2,smooth] plot (\x,{0.2*\x*\x + 0.5});
+        
+        % Labels
+        \node[below,fgwhite] at (0.5,0) {$a$};
+        \node[below,fgwhite] at (4,0) {$b$};
+        
+        % Delta x
+        \draw[<->,neonpink] (1,-0.4) -- (1.5,-0.4) node[midway,below] {$\Delta x$};
+    \end{tikzpicture}
+    
+    \vspace{0.3cm}
+    
+    \begin{defbox}[Riemann Sum]
+        \[
+            \text{Area} \approx \sum_{i=1}^{n} f(x_i) \cdot \Delta x
+        \]
+        
+        where $\Delta x = \frac{b-a}{n}$ is the width of each rectangle.
+    \end{defbox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% From Riemann Sum to Integral
+% -----------------------------------------------------------------------------
+\begin{frame}{From Rectangles to Integrals}
+    \begin{columns}
+        \begin{column}{0.33\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.5]
+                \draw[softgray] (0,0) -- (4,0);
+                \draw[softgray] (0,0) -- (0,2.5);
+                
+                \foreach \x in {0,1,2,3} {
+                    \pgfmathsetmacro{\h}{0.15*\x*\x + 0.5}
+                    \fill[neonyellow,opacity=0.4] (\x,0) rectangle (\x+1,\h);
+                    \draw[neonyellow] (\x,0) rectangle (\x+1,\h);
+                }
+                \draw[accentcyan,thick,domain=0:4,smooth] plot (\x,{0.15*\x*\x + 0.5});
+                
+                \node[below,fgwhite,font=\small] at (2,-0.3) {$n=4$};
+            \end{tikzpicture}
+        \end{column}
+        \begin{column}{0.33\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.5]
+                \draw[softgray] (0,0) -- (4,0);
+                \draw[softgray] (0,0) -- (0,2.5);
+                
+                \foreach \x in {0,0.5,...,3.5} {
+                    \pgfmathsetmacro{\h}{0.15*\x*\x + 0.5}
+                    \fill[neonyellow,opacity=0.4] (\x,0) rectangle (\x+0.5,\h);
+                    \draw[neonyellow] (\x,0) rectangle (\x+0.5,\h);
+                }
+                \draw[accentcyan,thick,domain=0:4,smooth] plot (\x,{0.15*\x*\x + 0.5});
+                
+                \node[below,fgwhite,font=\small] at (2,-0.3) {$n=8$};
+            \end{tikzpicture}
+        \end{column}
+        \begin{column}{0.33\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.5]
+                \draw[softgray] (0,0) -- (4,0);
+                \draw[softgray] (0,0) -- (0,2.5);
+                
+                \fill[accentcyan,opacity=0.4] (0,0) -- plot[domain=0:4,smooth] (\x,{0.15*\x*\x + 0.5}) -- (4,0) -- cycle;
+                \draw[accentcyan,thick,domain=0:4,smooth] plot (\x,{0.15*\x*\x + 0.5});
+                
+                \node[below,fgwhite,font=\small] at (2,-0.3) {$n \to \infty$};
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.5cm}
+    
+    \begin{thmbox}[Definition of Definite Integral]
+        \[
+            \int_a^b f(x)\, dx = \lim_{n \to \infty} \sum_{i=1}^{n} f(x_i) \cdot \Delta x
+        \]
+    \end{thmbox}
+    
+    \begin{funnybox}
+        As we use more and more rectangles ($n \to \infty$), we get the \textit{exact} area!
+    \end{funnybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Integral Notation
+% -----------------------------------------------------------------------------
+\begin{frame}{Understanding Integral Notation}
+    \[
+        \int_a^b f(x)\, dx
+    \]
+    
+    \vspace{0.3cm}
+    
+    \centering
+    \begin{tikzpicture}[scale=0.9]
+        % The integral symbol
+        \node[font=\Huge,neonpink] at (0,0) {$\displaystyle\int$};
+        \node[font=\small,fgwhite] at (0.3,0.8) {$b$};
+        \node[font=\small,fgwhite] at (0.3,-0.8) {$a$};
+        
+        % Annotations
+        \draw[->,neonyellow,thick] (-1,0) -- (-0.4,0);
+        \node[left,neonyellow,font=\small,align=right] at (-1,0) {``Sum'' symbol\\(elongated S)};
+        
+        \draw[->,neongreen,thick] (0.6,0.8) -- (0.3,0.6);
+        \node[right,neongreen,font=\small] at (0.6,0.8) {Upper limit};
+        
+        \draw[->,neongreen,thick] (0.6,-0.8) -- (0.3,-0.6);
+        \node[right,neongreen,font=\small] at (0.6,-0.8) {Lower limit};
+        
+        % Function part
+        \node[font=\Large,accentcyan] at (1.3,0) {$f(x)$};
+        \draw[->,accentcyan,thick] (1.3,-0.5) -- (1.3,-0.2);
+        \node[below,accentcyan,font=\small] at (1.3,-0.5) {Function (height)};
+        
+        % dx part
+        \node[font=\Large,neonpink] at (2.3,0) {$dx$};
+        \draw[->,neonpink,thick] (2.3,0.5) -- (2.3,0.2);
+        \node[above,neonpink,font=\small] at (2.3,0.5) {Infinitesimal width};
+    \end{tikzpicture}
+    
+    \vspace{0.5cm}
+    
+    \begin{infobox}
+        The integral $\int$ is a stretched ``S'' for ``Sum'' — we're adding up infinitely many $f(x) \cdot dx$ pieces!
+    \end{infobox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Antiderivatives
+% -----------------------------------------------------------------------------
+\begin{frame}{Antiderivatives: Reversing Differentiation}
+    \begin{defbox}[Antiderivative]
+        $F(x)$ is an \glow{antiderivative} of $f(x)$ if:
+        \[
+            F'(x) = f(x)
+        \]
+        
+        The antiderivative ``undoes'' differentiation!
+    \end{defbox}
+    
+    \vspace{0.3cm}
+    
+    \textbf{Examples:}
+    \begin{center}
+        \begin{tabular}{c|c|c}
+            $f(x)$ & $F(x)$ (antiderivative) & Check: $F'(x) = f(x)$? \\
+            \hline
+            $x^2$ & $\frac{x^3}{3}$ & $\frac{d}{dx}\left(\frac{x^3}{3}\right) = x^2$ (YES) \\
+            $\cos x$ & $\sin x$ & $\frac{d}{dx}(\sin x) = \cos x$ (YES) \\
+            $e^x$ & $e^x$ & $\frac{d}{dx}(e^x) = e^x$ (YES) \\
+        \end{tabular}
+    \end{center}
+    
+    \begin{alertbox}
+        But wait — if $F(x)$ is an antiderivative, so is $F(x) + C$ for any constant $C$!
+        
+        (Because $\frac{d}{dx}(F + C) = F' + 0 = f$)
+    \end{alertbox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Indefinite Integral
+% -----------------------------------------------------------------------------
+\begin{frame}{Indefinite Integral}
+    \begin{defbox}[Indefinite Integral]
+        The \glow{indefinite integral} represents all antiderivatives:
+        \[
+            \int f(x)\, dx = F(x) + C
+        \]
+        
+        where $C$ is the ``constant of integration'' (can be any number).
+    \end{defbox}
+    
+    \vspace{0.3cm}
+    
+    \textbf{Basic Integrals:}
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \begin{align*}
+                \int x^n\, dx &= \frac{x^{n+1}}{n+1} + C \quad (n \neq -1) \\
+                \int e^x\, dx &= e^x + C \\
+                \int \frac{1}{x}\, dx &= \ln|x| + C
+            \end{align*}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{align*}
+                \int \sin x\, dx &= -\cos x + C \\
+                \int \cos x\, dx &= \sin x + C \\
+                \int 1\, dx &= x + C
+            \end{align*}
+        \end{column}
+    \end{columns}
+    
+    \begin{funnybox}
+        Don't forget the $+C$! It's the most forgotten symbol in calculus.
+    \end{funnybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Fundamental Theorem of Calculus Part 1
+% -----------------------------------------------------------------------------
+\begin{frame}{Fundamental Theorem of Calculus: Part 1}
+    \begin{thmbox}[FTC Part 1]
+        If $f$ is continuous on $[a, b]$ and:
+        \[
+            g(x) = \int_a^x f(t)\, dt
+        \]
+        
+        Then $g$ is differentiable and:
+        \[
+            \glow{g'(x) = f(x)}
+        \]
+    \end{thmbox}
+    
+    \vspace{0.3cm}
+    
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \textbf{In words:}
+            
+            The derivative of the ``area so far'' function equals the original function!
+            
+            \vspace{0.3cm}
+            
+            \textbf{Symbolically:}
+            \[
+                \frac{d}{dx}\int_a^x f(t)\, dt = f(x)
+            \]
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.7]
+                \draw[<->,softgray] (-0.3,0) -- (4,0);
+                \draw[<->,softgray] (0,-0.3) -- (0,2.5);
+                
+                % Area
+                \fill[accentcyan,opacity=0.3] (0.5,0) -- plot[domain=0.5:2.5,smooth] (\x,{0.3*\x + 0.5}) -- (2.5,0) -- cycle;
+                
+                \draw[accentcyan,thick,domain=0.2:3.5,smooth] plot (\x,{0.3*\x + 0.5});
+                
+                % x marker
+                \draw[neonpink,dashed] (2.5,0) -- (2.5,1.25);
+                \node[below,fgwhite] at (2.5,0) {$x$};
+                
+                % g(x) label
+                \node[accentcyan] at (1.5,0.5) {$g(x)$};
+            \end{tikzpicture}
+            
+            {\small Rate of area growth = height of curve!}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Fundamental Theorem of Calculus Part 2
+% -----------------------------------------------------------------------------
+\begin{frame}{Fundamental Theorem of Calculus: Part 2}
+    \begin{thmbox}[FTC Part 2 (Evaluation Theorem)]
+        If $f$ is continuous on $[a, b]$ and $F$ is any antiderivative of $f$, then:
+        \[
+            \mathbf{\int_a^b f(x)\, dx = F(b) - F(a)}
+        \]
+    \end{thmbox}
+    
+    \vspace{0.3cm}
+    
+    \textbf{This is HUGE!} Instead of computing limits of Riemann sums, just:
+    \begin{enumerate}
+        \item Find an antiderivative $F$
+        \item Evaluate at the endpoints
+        \item Subtract!
+    \end{enumerate}
+    
+    \vspace{0.3cm}
+    
+    \textbf{Example:} $\displaystyle\int_0^2 x^2\, dx$
+    
+    Antiderivative: $F(x) = \frac{x^3}{3}$
+    
+    Answer: $F(2) - F(0) = \frac{8}{3} - 0 = \mathbf{\frac{8}{3}}$
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% FTC Connection
+% -----------------------------------------------------------------------------
+\begin{frame}{The Beautiful Connection}
+    \centering
+    \begin{tikzpicture}[scale=0.9]
+        % Differentiation
+        \node[rectangle,draw=neonpink,fill=darkgray,minimum width=2.5cm,minimum height=1cm] (diff) at (-2,0) {\textcolor{neonpink}{Differentiation}};
+        
+        % Integration
+        \node[rectangle,draw=accentcyan,fill=darkgray,minimum width=2.5cm,minimum height=1cm] (int) at (2,0) {\textcolor{accentcyan}{Integration}};
+        
+        % Functions
+        \node[above=0.5cm of diff,neonpink] {$F(x)$};
+        \node[above=0.5cm of int,accentcyan] {$f(x)$};
+        
+        % Arrows
+        \draw[->,thick,neonyellow] (diff.east) -- (int.west) node[midway,above] {$\frac{d}{dx}$};
+        \draw[->,thick,neonyellow] (int.west) to[bend left=40] node[midway,below] {$\int dx$} (diff.east);
+    \end{tikzpicture}
+    
+    \vspace{0.5cm}
+    
+    \begin{keybox}
+        Differentiation and Integration are \glow{inverse operations}!
+        
+        \vspace{0.2cm}
+        
+        \begin{itemize}
+            \item Differentiate then integrate: back where you started (+ C)
+            \item Integrate then differentiate: exactly back where you started
+        \end{itemize}
+    \end{keybox}
+    
+    \begin{funnybox}
+        They're like frenemies — opposite but inseparable!
+    \end{funnybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Integration by Substitution
+% -----------------------------------------------------------------------------
+\begin{frame}{Integration Technique: Substitution}
+    \begin{defbox}[u-Substitution]
+        For $\int f(g(x)) \cdot g'(x)\, dx$:
+        
+        \begin{enumerate}
+            \item Let $u = g(x)$
+            \item Then $du = g'(x)\, dx$
+            \item Substitute: $\int f(u)\, du$
+            \item Integrate and substitute back
+        \end{enumerate}
+    \end{defbox}
+    
+    \vspace{0.3cm}
+    
+    \textbf{Example:} $\int 2x \cdot e^{x^2}\, dx$
+    
+    \begin{itemize}
+        \item Let $u = x^2$, so $du = 2x\, dx$
+        \item Substitute: $\int e^u\, du = e^u + C$
+        \item Substitute back: $\mathbf{e^{x^2} + C}$
+    \end{itemize}
+    
+    \begin{funnybox}
+        ``When in doubt, u-sub it out!'' — Every calculus student
+    \end{funnybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Integration by Parts
+% -----------------------------------------------------------------------------
+\begin{frame}{Integration Technique: By Parts}
+    \begin{thmbox}[Integration by Parts]
+        \[
+            \int u\, dv = uv - \int v\, du
+        \]
+        
+        Derived from the product rule: $(uv)' = u'v + uv'$
+    \end{thmbox}
+    
+    \vspace{0.3cm}
+    
+    \textbf{Example:} $\int x \cdot e^x\, dx$
+    
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            Choose:
+            \begin{itemize}
+                \item $u = x \Rightarrow du = dx$
+                \item $dv = e^x\, dx \Rightarrow v = e^x$
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            Apply:
+            \begin{align*}
+                &= x \cdot e^x - \int e^x\, dx \\
+                &= xe^x - e^x + C \\
+                &= \mathbf{e^x(x-1) + C}
+            \end{align*}
+        \end{column}
+    \end{columns}
+    
+    \begin{infobox}[LIATE Rule]
+        Choose $u$ in order: \textbf{L}og, \textbf{I}nverse trig, \textbf{A}lgebraic, \textbf{T}rig, \textbf{E}xponential
+    \end{infobox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Why Integration Matters
+% -----------------------------------------------------------------------------
+\begin{frame}{Why Integration Matters in ML}
+    \begin{keybox}[Applications]
+        \begin{enumerate}
+            \item \textbf{Probability Distributions}
+            \[
+                P(a \leq X \leq b) = \int_a^b f(x)\, dx
+            \]
+            (Area under probability density function)
+            
+            \item \textbf{Expected Values}
+            \[
+                E[X] = \int_{-\infty}^{\infty} x \cdot f(x)\, dx
+            \]
+            
+            \item \textbf{Loss Functions} (continuous case)
+            
+            \item \textbf{Backpropagation} involves computing areas/volumes
+            
+            \item \textbf{Gaussian Integrals} (normal distribution!)
+        \end{enumerate}
+    \end{keybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Key Takeaways
+% -----------------------------------------------------------------------------
+\begin{frame}{Key Takeaways: Integration}
+    \begin{keybox}
+        \begin{enumerate}
+            \item \textbf{Riemann sum}: Approximate area with rectangles
+            \item \textbf{Definite integral} $\int_a^b f(x)\, dx$: Exact area under curve
+            \item \textbf{Antiderivative}: $F$ where $F' = f$
+            \item \textbf{Indefinite integral}: $\int f\, dx = F + C$
+            \item \textbf{FTC}: $\int_a^b f\, dx = F(b) - F(a)$
+            \item \textbf{Integration and differentiation are inverses!}
+            \item \textbf{Techniques}: Substitution, by parts
+            \item \textbf{ML uses}: Probability, expectations, continuous losses
+        \end{enumerate}
+    \end{keybox}
+    
+    \vspace{0.2cm}
+    
+    \centering
+    \textit{Next: Graph Theory — the foundation for neural network structure!}
+\end{frame}

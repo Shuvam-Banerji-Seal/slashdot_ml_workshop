@@ -1,0 +1,492 @@
+% =============================================================================
+% Section 7: Graph Theory Basics
+% Understanding networks - the foundation for neural networks
+% =============================================================================
+
+\section{Graph Theory Basics}
+
+% -----------------------------------------------------------------------------
+% Opening
+% -----------------------------------------------------------------------------
+\begin{frame}{Graph Theory: Networks Before the Internet}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{funnybox}
+                \textit{``Facebook, Twitter, neural networks — they're all just graphs in disguise. Euler figured this out in 1736 while solving a bridge puzzle!''}
+            \end{funnybox}
+            
+            \vspace{0.3cm}
+            
+            \textbf{Why Graphs for ML?}
+            \begin{itemize}
+                \item Neural networks ARE graphs
+                \item Information flows through edges
+                \item Structure determines computation
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.8]
+                % Simple graph
+                \node[circle,draw=accentcyan,fill=darkgray,minimum size=0.8cm] (A) at (0,2) {A};
+                \node[circle,draw=accentcyan,fill=darkgray,minimum size=0.8cm] (B) at (2,2) {B};
+                \node[circle,draw=accentcyan,fill=darkgray,minimum size=0.8cm] (C) at (3,0) {C};
+                \node[circle,draw=accentcyan,fill=darkgray,minimum size=0.8cm] (D) at (1,0) {D};
+                \node[circle,draw=accentcyan,fill=darkgray,minimum size=0.8cm] (E) at (-1,0) {E};
+                
+                % Edges
+                \draw[neonpink,thick] (A) -- (B);
+                \draw[neonpink,thick] (A) -- (D);
+                \draw[neonpink,thick] (A) -- (E);
+                \draw[neonpink,thick] (B) -- (C);
+                \draw[neonpink,thick] (B) -- (D);
+                \draw[neonpink,thick] (C) -- (D);
+                \draw[neonpink,thick] (D) -- (E);
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Graph Definition
+% -----------------------------------------------------------------------------
+\begin{frame}{What is a Graph?}
+    \begin{defbox}[Graph]
+        A \glow{graph} $G = (V, E)$ consists of:
+        \begin{itemize}
+            \item $V$ = set of \textbf{vertices} (or nodes)
+            \item $E$ = set of \textbf{edges} (connections between vertices)
+        \end{itemize}
+        
+        Each edge $e \in E$ connects two vertices.
+    \end{defbox}
+    
+    \vspace{0.3cm}
+    
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \textbf{Example:}
+            \begin{align*}
+                V &= \{1, 2, 3, 4\} \\
+                E &= \{\{1,2\}, \{1,3\}, \{2,3\}, \{3,4\}\}
+            \end{align*}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.9]
+                \node[circle,draw=neongreen,fill=darkgray] (1) at (0,1) {1};
+                \node[circle,draw=neongreen,fill=darkgray] (2) at (2,1) {2};
+                \node[circle,draw=neongreen,fill=darkgray] (3) at (1,0) {3};
+                \node[circle,draw=neongreen,fill=darkgray] (4) at (3,0) {4};
+                
+                \draw[accentcyan,thick] (1) -- (2);
+                \draw[accentcyan,thick] (1) -- (3);
+                \draw[accentcyan,thick] (2) -- (3);
+                \draw[accentcyan,thick] (3) -- (4);
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Types of Graphs
+% -----------------------------------------------------------------------------
+\begin{frame}{Types of Graphs}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{defbox}[Undirected Graph]
+                Edges have no direction — connection is mutual.
+                
+                \centering
+                \begin{tikzpicture}[scale=0.6]
+                    \node[circle,draw=accentcyan,fill=darkgray,minimum size=0.6cm] (A) at (0,0) {};
+                    \node[circle,draw=accentcyan,fill=darkgray,minimum size=0.6cm] (B) at (2,0) {};
+                    \draw[neonpink,thick] (A) -- (B);
+                \end{tikzpicture}
+                
+                A and B are connected (symmetric).
+            \end{defbox}
+            
+            \vspace{0.3cm}
+            
+            \begin{defbox}[Directed Graph (Digraph)]
+                Edges have direction — one-way connection.
+                
+                \centering
+                \begin{tikzpicture}[scale=0.6]
+                    \node[circle,draw=accentcyan,fill=darkgray,minimum size=0.6cm] (A) at (0,0) {};
+                    \node[circle,draw=accentcyan,fill=darkgray,minimum size=0.6cm] (B) at (2,0) {};
+                    \draw[->,neonpink,thick] (A) -- (B);
+                \end{tikzpicture}
+                
+                A points to B (asymmetric).
+            \end{defbox}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{defbox}[Weighted Graph]
+                Edges have associated values (weights).
+                
+                \centering
+                \begin{tikzpicture}[scale=0.6]
+                    \node[circle,draw=accentcyan,fill=darkgray,minimum size=0.6cm] (A) at (0,0) {};
+                    \node[circle,draw=accentcyan,fill=darkgray,minimum size=0.6cm] (B) at (2,0) {};
+                    \draw[neonpink,thick] (A) -- (B) node[midway,above,neonyellow] {0.7};
+                \end{tikzpicture}
+                
+                Connection strength = 0.7
+            \end{defbox}
+            
+            \vspace{0.3cm}
+            
+            \begin{keybox}[Neural Networks]
+                Neural networks are \textbf{directed, weighted} graphs!
+                
+                \begin{itemize}
+                    \item Neurons = vertices
+                    \item Weights = edge values
+                    \item Direction = information flow
+                \end{itemize}
+            \end{keybox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Vertex Degree
+% -----------------------------------------------------------------------------
+\begin{frame}{Degree of a Vertex}
+    \begin{defbox}[Degree]
+        The \glow{degree} of a vertex is the number of edges connected to it.
+        
+        For directed graphs:
+        \begin{itemize}
+            \item \textbf{In-degree}: edges coming IN
+            \item \textbf{Out-degree}: edges going OUT
+        \end{itemize}
+    \end{defbox}
+    
+    \vspace{0.3cm}
+    
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.8]
+                \node[circle,draw=neonyellow,fill=darkgray,minimum size=0.8cm] (A) at (0,0) {A};
+                \node[circle,draw=accentcyan,fill=darkgray,minimum size=0.8cm] (B) at (2,1) {B};
+                \node[circle,draw=accentcyan,fill=darkgray,minimum size=0.8cm] (C) at (2,-1) {C};
+                \node[circle,draw=accentcyan,fill=darkgray,minimum size=0.8cm] (D) at (-2,0) {D};
+                
+                \draw[neonpink,thick] (A) -- (B);
+                \draw[neonpink,thick] (A) -- (C);
+                \draw[neonpink,thick] (A) -- (D);
+                
+                \node[below=0.5cm,fgwhite] at (0,-1.5) {deg(A) = 3};
+            \end{tikzpicture}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.8]
+                \node[circle,draw=neonyellow,fill=darkgray,minimum size=0.8cm] (A) at (0,0) {A};
+                \node[circle,draw=accentcyan,fill=darkgray,minimum size=0.8cm] (B) at (2,1) {B};
+                \node[circle,draw=accentcyan,fill=darkgray,minimum size=0.8cm] (C) at (2,-1) {C};
+                \node[circle,draw=accentcyan,fill=darkgray,minimum size=0.8cm] (D) at (-2,0) {D};
+                
+                \draw[->,neonpink,thick] (B) -- (A);
+                \draw[->,neonpink,thick] (A) -- (C);
+                \draw[->,neonpink,thick] (D) -- (A);
+                
+                \node[below=0.3cm,fgwhite,font=\small] at (0,-1.5) {in(A)=2, out(A)=1};
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Paths and Connectivity
+% -----------------------------------------------------------------------------
+\begin{frame}{Paths and Connectivity}
+    \begin{defbox}[Path]
+        A \glow{path} is a sequence of vertices connected by edges:
+        \[
+            v_0 \rightarrow v_1 \rightarrow v_2 \rightarrow \cdots \rightarrow v_k
+        \]
+        
+        \textbf{Path length} = number of edges (here: $k$)
+    \end{defbox}
+    
+    \vspace{0.3cm}
+    
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \begin{defbox}[Connected Graph]
+                A graph is \glow{connected} if there exists a path between every pair of vertices.
+            \end{defbox}
+            
+            \begin{funnybox}
+                Can you get from any vertex to any other? If yes: connected!
+            \end{funnybox}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.7]
+                % Connected component 1
+                \node[circle,draw=neongreen,fill=darkgray,minimum size=0.6cm] (1) at (0,1) {};
+                \node[circle,draw=neongreen,fill=darkgray,minimum size=0.6cm] (2) at (1,0) {};
+                \node[circle,draw=neongreen,fill=darkgray,minimum size=0.6cm] (3) at (0,-1) {};
+                \draw[neongreen,thick] (1) -- (2) -- (3) -- (1);
+                
+                % Connected component 2
+                \node[circle,draw=neonpink,fill=darkgray,minimum size=0.6cm] (4) at (3,0.5) {};
+                \node[circle,draw=neonpink,fill=darkgray,minimum size=0.6cm] (5) at (3,-0.5) {};
+                \draw[neonpink,thick] (4) -- (5);
+                
+                \node[below,fgwhite,font=\small] at (1.5,-1.5) {NOT connected (2 components)};
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Adjacency Matrix
+% -----------------------------------------------------------------------------
+\begin{frame}{Adjacency Matrix: Graphs as Matrices}
+    \begin{defbox}[Adjacency Matrix]
+        For a graph with $n$ vertices, the \glow{adjacency matrix} $A$ is an $n \times n$ matrix where:
+        \[
+            A_{ij} = \begin{cases}
+                1 & \text{if edge from } i \text{ to } j \\
+                w_{ij} & \text{if weighted edge} \\
+                0 & \text{otherwise}
+            \end{cases}
+        \]
+    \end{defbox}
+    
+    \vspace{0.3cm}
+    
+    \begin{columns}
+        \begin{column}{0.4\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.8]
+                \node[circle,draw=accentcyan,fill=darkgray] (1) at (0,1.5) {1};
+                \node[circle,draw=accentcyan,fill=darkgray] (2) at (1.5,1.5) {2};
+                \node[circle,draw=accentcyan,fill=darkgray] (3) at (1.5,0) {3};
+                \node[circle,draw=accentcyan,fill=darkgray] (4) at (0,0) {4};
+                
+                \draw[neonpink,thick] (1) -- (2);
+                \draw[neonpink,thick] (1) -- (4);
+                \draw[neonpink,thick] (2) -- (3);
+                \draw[neonpink,thick] (3) -- (4);
+            \end{tikzpicture}
+        \end{column}
+        \begin{column}{0.6\textwidth}
+            \[
+                A = \begin{pmatrix}
+                    0 & 1 & 0 & 1 \\
+                    1 & 0 & 1 & 0 \\
+                    0 & 1 & 0 & 1 \\
+                    1 & 0 & 1 & 0
+                \end{pmatrix}
+            \]
+            
+            Row $i$, Column $j$ = connection from $i$ to $j$
+        \end{column}
+    \end{columns}
+    
+    \begin{keybox}
+        For undirected graphs: $A$ is symmetric ($A = A^T$)
+    \end{keybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Neural Network as Graph
+% -----------------------------------------------------------------------------
+\begin{frame}{Neural Networks AS Graphs}
+    \centering
+    \begin{tikzpicture}[scale=0.9]
+        % Input layer
+        \foreach \i in {1,2,3} {
+            \node[input neuron] (I\i) at (0, 2-\i) {$x_\i$};
+        }
+        
+        % Hidden layer 1
+        \foreach \i in {1,2,3,4} {
+            \node[hidden neuron] (H1\i) at (2.5, 2.5-\i) {};
+        }
+        
+        % Hidden layer 2
+        \foreach \i in {1,2,3} {
+            \node[hidden neuron] (H2\i) at (5, 2-\i) {};
+        }
+        
+        % Output layer
+        \foreach \i in {1,2} {
+            \node[output neuron] (O\i) at (7.5, 1.5-\i) {$y_\i$};
+        }
+        
+        % Connections (sample)
+        \foreach \i in {1,2,3} {
+            \foreach \j in {1,2,3,4} {
+                \draw[connection] (I\i) -- (H1\j);
+            }
+        }
+        
+        \foreach \i in {1,2,3,4} {
+            \foreach \j in {1,2,3} {
+                \draw[connection] (H1\i) -- (H2\j);
+            }
+        }
+        
+        \foreach \i in {1,2,3} {
+            \foreach \j in {1,2} {
+                \draw[connection] (H2\i) -- (O\j);
+            }
+        }
+        
+        % Labels
+        \node[neongreen,above,font=\small] at (0,1.5) {Input};
+        \node[accentcyan,above,font=\small] at (2.5,2) {Hidden 1};
+        \node[accentcyan,above,font=\small] at (5,1.5) {Hidden 2};
+        \node[neonpink,above,font=\small] at (7.5,1) {Output};
+    \end{tikzpicture}
+    
+    \vspace{0.3cm}
+    
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \begin{itemize}
+                \item \textbf{Vertices}: Neurons (circles)
+                \item \textbf{Edges}: Connections (arrows)
+                \item \textbf{Weights}: Edge values (learned!)
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{itemize}
+                \item \textbf{Direction}: Left to right (feedforward)
+                \item \textbf{Layers}: Groups of vertices
+                \item \textbf{Computation}: Flows through graph
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Information Flow
+% -----------------------------------------------------------------------------
+\begin{frame}{Information Flow Through Graphs}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{infobox}[Forward Pass]
+                Information flows from input to output:
+                
+                \begin{enumerate}
+                    \item Input enters at source nodes
+                    \item Each node computes a value
+                    \item Values propagate along edges
+                    \item Output emerges at sink nodes
+                \end{enumerate}
+            \end{infobox}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.8]
+                \node[circle,draw=neongreen,fill=darkgray] (x1) at (0,1) {$x_1$};
+                \node[circle,draw=neongreen,fill=darkgray] (x2) at (0,-1) {$x_2$};
+                
+                \node[circle,draw=accentcyan,fill=darkgray] (h) at (2,0) {$h$};
+                
+                \node[circle,draw=neonpink,fill=darkgray] (y) at (4,0) {$y$};
+                
+                \draw[->,thick,neonyellow] (x1) -- (h) node[midway,above,font=\small] {$w_1$};
+                \draw[->,thick,neonyellow] (x2) -- (h) node[midway,below,font=\small] {$w_2$};
+                \draw[->,thick,neonyellow] (h) -- (y) node[midway,above,font=\small] {$w_3$};
+                
+                % Computation
+                \node[below=0.8cm,fgwhite,font=\small] at (2,0) {$h = \sigma(w_1 x_1 + w_2 x_2)$};
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.5cm}
+    
+    \begin{keybox}
+        The graph structure determines:
+        \begin{itemize}
+            \item What information each neuron receives
+            \item How information is combined
+            \item What the network can compute!
+        \end{itemize}
+    \end{keybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Graph Properties Summary
+% -----------------------------------------------------------------------------
+\begin{frame}{Graph Properties for ML}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{defbox}[DAG]
+                A \glow{Directed Acyclic Graph} has:
+                \begin{itemize}
+                    \item Directed edges
+                    \item No cycles (can't loop back)
+                \end{itemize}
+                
+                Feedforward neural networks are DAGs!
+            \end{defbox}
+            
+            \vspace{0.3cm}
+            
+            \begin{defbox}[Bipartite Graph]
+                Vertices split into two groups — edges only between groups.
+                
+                Adjacent layers in a NN form bipartite subgraphs!
+            \end{defbox}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{defbox}[Complete Graph]
+                Every vertex connected to every other.
+                
+                \centering
+                \begin{tikzpicture}[scale=0.5]
+                    \foreach \i in {1,...,5} {
+                        \node[circle,draw=accentcyan,fill=darkgray,minimum size=0.4cm] (\i) at ({90+72*(\i-1)}:1.2) {};
+                    }
+                    \foreach \i in {1,...,5} {
+                        \foreach \j in {\i,...,5} {
+                            \draw[neonpink] (\i) -- (\j);
+                        }
+                    }
+                \end{tikzpicture}
+                
+                ``Fully connected'' layers!
+            \end{defbox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Key Takeaways
+% -----------------------------------------------------------------------------
+\begin{frame}{Key Takeaways: Graph Theory}
+    \begin{keybox}
+        \begin{enumerate}
+            \item \textbf{Graph} $G = (V, E)$: vertices and edges
+            \item \textbf{Types}: undirected, directed, weighted
+            \item \textbf{Degree}: number of connections
+            \item \textbf{Path}: sequence of connected vertices
+            \item \textbf{Adjacency matrix}: graph as a matrix
+            \item \textbf{Neural networks are graphs!}
+            \begin{itemize}
+                \item Neurons = vertices
+                \item Connections = weighted, directed edges
+                \item Feedforward NN = DAG
+            \end{itemize}
+            \item Structure determines computation capability
+        \end{enumerate}
+    \end{keybox}
+    
+    \vspace{0.2cm}
+    
+    \centering
+    \textit{Next: Python Environment Setup — preparing our tools!}
+\end{frame}

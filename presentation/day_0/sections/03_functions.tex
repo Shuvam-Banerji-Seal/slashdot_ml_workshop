@@ -1,0 +1,596 @@
+% =============================================================================
+% Section 3: Functions & Parameters
+% The building blocks of mathematical relationships
+% =============================================================================
+
+\section{Functions \& Parameters}
+
+% -----------------------------------------------------------------------------
+% Opening
+% -----------------------------------------------------------------------------
+\begin{frame}{Functions: Mathematical Vending Machines}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{funnybox}
+                \textit{``A function is like a vending machine: put in coins (input), get a snack (output). No coins? No snack. Wrong coins? Error!''}
+            \end{funnybox}
+            
+            \vspace{0.3cm}
+            
+            \textbf{Key Questions:}
+            \begin{itemize}
+                \item What goes in? (Domain)
+                \item What comes out? (Range)
+                \item What's the rule? (Function definition)
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.8]
+                % Vending machine
+                \draw[accentcyan,thick,rounded corners] (-1.5,-2) rectangle (1.5,2);
+                
+                % Input slot
+                \draw[neongreen,thick,fill=darkgray] (-0.5,1.5) rectangle (0.5,1.8);
+                \node[neongreen,above,font=\small] at (0,1.8) {Input $x$};
+                
+                % Function box
+                \node[accentcyan,font=\Large] at (0,0.5) {$f$};
+                \draw[accentcyan] (-0.8,0) rectangle (0.8,1);
+                
+                % Output slot
+                \draw[neonpink,thick,fill=darkgray] (-0.5,-1.8) rectangle (0.5,-1.5);
+                \node[neonpink,below,font=\small] at (0,-1.8) {Output $f(x)$};
+                
+                % Arrow
+                \draw[->,neonyellow,thick] (0,1.5) -- (0,1);
+                \draw[->,neonyellow,thick] (0,0) -- (0,-1.5);
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Formal Definition
+% -----------------------------------------------------------------------------
+\begin{frame}{Formal Definition of a Function}
+    \begin{defbox}[Function]
+        A \glow{function} $f$ from set $A$ to set $B$, written $f: A \rightarrow B$, is a rule that assigns to \textbf{each} element $x \in A$ \textbf{exactly one} element $f(x) \in B$.
+        
+        \vspace{0.3cm}
+        
+        \begin{itemize}
+            \item $A$ = \textbf{Domain} (all valid inputs)
+            \item $B$ = \textbf{Codomain} (possible outputs)
+            \item $\{f(x) : x \in A\}$ = \textbf{Range} (actual outputs)
+        \end{itemize}
+    \end{defbox}
+    
+    \vspace{0.3cm}
+    
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.7]
+                % Domain
+                \draw[neongreen,thick] (-2,0) ellipse (1cm and 1.5cm);
+                \node[neongreen,above] at (-2,1.7) {Domain $A$};
+                \foreach \y in {0.8,0,-0.8} {
+                    \fill[neongreen] (-2,\y) circle (3pt);
+                }
+                
+                % Codomain
+                \draw[neonpink,thick] (2,0) ellipse (1cm and 1.5cm);
+                \node[neonpink,above] at (2,1.7) {Codomain $B$};
+                \foreach \y in {0.8,0,-0.8} {
+                    \fill[neonpink] (2,\y) circle (3pt);
+                }
+                
+                % Arrows
+                \draw[->,accentcyan,thick] (-1.2,0.8) -- (1.2,0);
+                \draw[->,accentcyan,thick] (-1.2,0) -- (1.2,0.8);
+                \draw[->,accentcyan,thick] (-1.2,-0.8) -- (1.2,-0.8);
+                
+                \node[accentcyan,above] at (0,0.5) {$f$};
+            \end{tikzpicture}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{alertbox}[Key Rule]
+                Each input maps to \textbf{exactly one} output!
+                
+                \vspace{0.2cm}
+                
+                One input $\rightarrow$ multiple outputs = NOT a function!
+            \end{alertbox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Function Notation
+% -----------------------------------------------------------------------------
+\begin{frame}{Function Notation}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{defbox}[Standard Notation]
+                \textbf{Defining a function:}
+                \begin{align*}
+                    f(x) &= x^2 \\
+                    g(x) &= 2x + 1 \\
+                    h(x, y) &= x^2 + y^2
+                \end{align*}
+                
+                \textbf{Evaluating:}
+                \begin{align*}
+                    f(3) &= 3^2 = 9 \\
+                    g(-1) &= 2(-1) + 1 = -1 \\
+                    h(1, 2) &= 1 + 4 = 5
+                \end{align*}
+            \end{defbox}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{defbox}[Arrow Notation]
+                \[
+                    f: \mathbb{R} \rightarrow \mathbb{R}
+                \]
+                \[
+                    x \mapsto x^2
+                \]
+                
+                ``$f$ takes real numbers to real numbers, mapping $x$ to $x^2$''
+            \end{defbox}
+            
+            \vspace{0.3cm}
+            
+            \begin{funnybox}
+                Same thing, fancier packaging. Mathematicians love options!
+            \end{funnybox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Domain and Range
+% -----------------------------------------------------------------------------
+\begin{frame}{Domain, Codomain, and Range}
+    \textbf{Example:} $f(x) = \sqrt{x}$ where $f: \mathbb{R}_{\geq 0} \rightarrow \mathbb{R}$
+    
+    \vspace{0.3cm}
+    
+    \begin{columns}[T]
+        \begin{column}{0.33\textwidth}
+            \begin{infobox}[Domain]
+                All valid inputs
+                
+                \vspace{0.2cm}
+                
+                For $\sqrt{x}$: $x \geq 0$
+                
+                (Can't sqrt negative reals!)
+                
+                \[
+                    \text{Dom}(f) = [0, \infty)
+                \]
+            \end{infobox}
+        \end{column}
+        \begin{column}{0.33\textwidth}
+            \begin{infobox}[Codomain]
+                Set of possible outputs
+                
+                \vspace{0.2cm}
+                
+                Here: all real numbers $\mathbb{R}$
+                
+                (We \textit{could} land anywhere)
+                
+                \[
+                    \text{Codomain} = \mathbb{R}
+                \]
+            \end{infobox}
+        \end{column}
+        \begin{column}{0.33\textwidth}
+            \begin{infobox}[Range]
+                Actual outputs produced
+                
+                \vspace{0.2cm}
+                
+                $\sqrt{x} \geq 0$ always!
+                
+                Range $\subseteq$ Codomain
+                
+                \[
+                    \text{Range}(f) = [0, \infty)
+                \]
+            \end{infobox}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.3cm}
+    
+    \centering
+    \begin{tikzpicture}[scale=0.8]
+        \draw[<->,thick,softgray] (-0.5,0) -- (4,0) node[right] {$x$};
+        \draw[<->,thick,softgray] (0,-0.5) -- (0,2.5) node[above] {$y$};
+        
+        \draw[accentcyan,thick,domain=0:3.5,smooth,samples=50] plot (\x,{sqrt(\x)});
+        
+        \node[accentcyan,right] at (3.5,1.87) {$f(x) = \sqrt{x}$};
+    \end{tikzpicture}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Parameters vs Variables
+% -----------------------------------------------------------------------------
+\begin{frame}{Parameters vs Variables: The Director and the Actor}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{defbox}[Variables]
+                \glow[neongreen]{Variables} are the \textbf{inputs} to a function.
+                
+                \vspace{0.2cm}
+                
+                They vary — that's why we call them variables!
+                
+                \vspace{0.2cm}
+                
+                Example: In $f(x) = x^2$, $x$ is the variable.
+            \end{defbox}
+            
+            \vspace{0.3cm}
+            
+            \centering
+            {\Large Variables = \textbf{Actors}}
+            
+            {\small (They perform based on the script)}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{defbox}[Parameters]
+                \glow[neonpink]{Parameters} are \textbf{constants} that control behavior.
+                
+                \vspace{0.2cm}
+                
+                They're fixed during evaluation but can be tuned!
+                
+                \vspace{0.2cm}
+                
+                Example: In $f(x) = mx + b$, $m$ and $b$ are parameters.
+            \end{defbox}
+            
+            \vspace{0.3cm}
+            
+            \centering
+            {\Large Parameters = \textbf{Director}}
+            
+            {\small (They control how the show runs)}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Parametric Functions
+% -----------------------------------------------------------------------------
+\begin{frame}{Parametric Functions: $f(x; \theta)$}
+    \begin{defbox}[Parametric Notation]
+        We write $f(x; \theta)$ to show:
+        \begin{itemize}
+            \item $x$ = variable (input)
+            \item $\theta$ = parameter(s) (controls shape/behavior)
+        \end{itemize}
+        
+        The semicolon separates variables from parameters.
+    \end{defbox}
+    
+    \vspace{0.3cm}
+    
+    \textbf{Example: Linear Function}
+    \[
+        f(x; m, b) = mx + b
+    \]
+    
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.6]
+                \draw[<->,thick,softgray] (-2,0) -- (3,0) node[right] {$x$};
+                \draw[<->,thick,softgray] (0,-1) -- (0,3) node[above] {$y$};
+                
+                % Different slopes
+                \draw[neongreen,thick] (-1.5,-0.5) -- (2.5,2.5);
+                \draw[accentcyan,thick] (-1.5,0.5) -- (2.5,1.5);
+                \draw[neonpink,thick] (-1.5,2) -- (2.5,0);
+                
+                \node[neongreen,right,font=\small] at (2,2) {$m=1$};
+                \node[accentcyan,right,font=\small] at (2,1.3) {$m=0.25$};
+                \node[neonpink,right,font=\small] at (2,0.3) {$m=-0.5$};
+            \end{tikzpicture}
+            
+            Varying $m$ (slope)
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.6]
+                \draw[<->,thick,softgray] (-2,0) -- (3,0) node[right] {$x$};
+                \draw[<->,thick,softgray] (0,-1) -- (0,3) node[above] {$y$};
+                
+                % Different intercepts
+                \draw[neongreen,thick] (-1.5,-0.5) -- (2.5,1.5);
+                \draw[accentcyan,thick] (-1.5,0.5) -- (2.5,2.5);
+                \draw[neonpink,thick] (-1.5,-1) -- (2.5,1);
+                
+                \node[neongreen,right,font=\small] at (2,1.2) {$b=0$};
+                \node[accentcyan,right,font=\small] at (2,2.2) {$b=1$};
+                \node[neonpink,right,font=\small] at (2,0.7) {$b=-0.5$};
+            \end{tikzpicture}
+            
+            Varying $b$ (intercept)
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Why Parameters Matter in ML
+% -----------------------------------------------------------------------------
+\begin{frame}{Why Parameters Matter in Machine Learning}
+    \begin{keybox}[The ML Connection]
+        In Machine Learning:
+        \begin{itemize}
+            \item \textbf{Variables} ($x$) = your data (inputs/features)
+            \item \textbf{Parameters} ($\theta$) = what the model \glow{learns}!
+        \end{itemize}
+        
+        \vspace{0.2cm}
+        
+        Training a neural network = finding the best parameters $\theta^*$
+    \end{keybox}
+    
+    \vspace{0.3cm}
+    
+    \textbf{Example: Neural Network}
+    \[
+        \hat{y} = f(x; W, b) = \sigma(Wx + b)
+    \]
+    
+    \begin{itemize}
+        \item $x$ = input data (fixed during prediction)
+        \item $W$ = weight matrix (learned)
+        \item $b$ = bias vector (learned)
+        \item $\sigma$ = activation function
+    \end{itemize}
+    
+    \begin{funnybox}
+        Training = Turning knobs ($\theta$) until the output looks right!
+    \end{funnybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Types of Functions
+% -----------------------------------------------------------------------------
+\begin{frame}{Common Function Types}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{defbox}[Linear]
+                $f(x) = mx + b$
+                
+                \centering
+                \begin{tikzpicture}[scale=0.4]
+                    \draw[<->,softgray] (-2,0) -- (2,0);
+                    \draw[<->,softgray] (0,-1.5) -- (0,2);
+                    \draw[accentcyan,thick] (-1.5,-1) -- (1.5,2);
+                \end{tikzpicture}
+            \end{defbox}
+            
+            \vspace{0.2cm}
+            
+            \begin{defbox}[Polynomial]
+                $f(x) = a_nx^n + ... + a_1x + a_0$
+                
+                \centering
+                \begin{tikzpicture}[scale=0.4]
+                    \draw[<->,softgray] (-2,0) -- (2,0);
+                    \draw[<->,softgray] (0,-1) -- (0,2.5);
+                    \draw[neongreen,thick,domain=-1.3:1.3,smooth] plot (\x,{\x*\x});
+                \end{tikzpicture}
+            \end{defbox}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{defbox}[Exponential]
+                $f(x) = a^x$ or $e^x$
+                
+                \centering
+                \begin{tikzpicture}[scale=0.4]
+                    \draw[<->,softgray] (-2,0) -- (2,0);
+                    \draw[<->,softgray] (0,-0.5) -- (0,2.5);
+                    \draw[neonyellow,thick,domain=-1.5:1,smooth] plot (\x,{exp(\x)});
+                \end{tikzpicture}
+            \end{defbox}
+            
+            \vspace{0.2cm}
+            
+            \begin{defbox}[Trigonometric]
+                $\sin(x), \cos(x), \tan(x)$
+                
+                \centering
+                \begin{tikzpicture}[scale=0.4]
+                    \draw[<->,softgray] (-2,0) -- (2,0);
+                    \draw[<->,softgray] (0,-1.5) -- (0,1.5);
+                    \draw[neonpink,thick,domain=-1.8:1.8,smooth,samples=50] plot (\x,{sin(2*\x r)});
+                \end{tikzpicture}
+            \end{defbox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Function Composition
+% -----------------------------------------------------------------------------
+\begin{frame}{Function Composition: Chaining Functions}
+    \begin{defbox}[Composition]
+        The \glow{composition} of $f$ and $g$, written $(f \circ g)(x)$:
+        \[
+            (f \circ g)(x) = f(g(x))
+        \]
+        
+        ``Apply $g$ first, then apply $f$ to the result''
+    \end{defbox}
+    
+    \vspace{0.3cm}
+    
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \textbf{Example:}
+            \begin{align*}
+                f(x) &= x^2 \\
+                g(x) &= x + 1 \\
+                (f \circ g)(x) &= f(g(x)) = f(x+1) = (x+1)^2 \\
+                (g \circ f)(x) &= g(f(x)) = g(x^2) = x^2 + 1
+            \end{align*}
+            
+            \begin{alertbox}
+                Order matters! $f \circ g \neq g \circ f$ in general!
+            \end{alertbox}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.7]
+                % Input
+                \node[circle,draw=neongreen,fill=darkgray,minimum size=1cm] (x) at (0,0) {$x$};
+                
+                % g box
+                \node[rectangle,draw=accentcyan,fill=darkgray,minimum size=0.8cm] (g) at (2,0) {$g$};
+                
+                % f box
+                \node[rectangle,draw=neonpink,fill=darkgray,minimum size=0.8cm] (f) at (4,0) {$f$};
+                
+                % Output
+                \node[circle,draw=neonyellow,fill=darkgray,minimum size=1cm] (y) at (6,0) {$y$};
+                
+                % Arrows
+                \draw[->,thick,fgwhite] (x) -- (g);
+                \draw[->,thick,fgwhite] (g) -- (f) node[midway,above,font=\small] {$g(x)$};
+                \draw[->,thick,fgwhite] (f) -- (y);
+                
+                % Label
+                \node[below,fgwhite,font=\small] at (3,-1) {$y = (f \circ g)(x) = f(g(x))$};
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Composition in Neural Networks
+% -----------------------------------------------------------------------------
+\begin{frame}{Composition in Neural Networks}
+    \begin{keybox}[Neural Networks = Composed Functions]
+        A neural network is just a big composition of simple functions!
+    \end{keybox}
+    
+    \vspace{0.3cm}
+    
+    \centering
+    \begin{tikzpicture}[scale=0.8]
+        % Layers as function boxes
+        \node[rectangle,draw=neongreen,fill=darkgray,minimum width=1.5cm,minimum height=0.8cm] (l1) at (0,0) {$f_1$};
+        \node[rectangle,draw=accentcyan,fill=darkgray,minimum width=1.5cm,minimum height=0.8cm] (l2) at (2.5,0) {$f_2$};
+        \node[rectangle,draw=accentcyan,fill=darkgray,minimum width=1.5cm,minimum height=0.8cm] (l3) at (5,0) {$f_3$};
+        \node[rectangle,draw=neonpink,fill=darkgray,minimum width=1.5cm,minimum height=0.8cm] (l4) at (7.5,0) {$f_4$};
+        
+        % Input/Output
+        \node[left=0.5cm of l1,fgwhite] (x) {$x$};
+        \node[right=0.5cm of l4,fgwhite] (y) {$\hat{y}$};
+        
+        % Arrows
+        \draw[->,thick,fgwhite] (x) -- (l1);
+        \draw[->,thick,fgwhite] (l1) -- (l2);
+        \draw[->,thick,fgwhite] (l2) -- (l3);
+        \draw[->,thick,fgwhite] (l3) -- (l4);
+        \draw[->,thick,fgwhite] (l4) -- (y);
+        
+        % Labels
+        \node[below=0.3cm,neongreen,font=\small] at (l1) {Input};
+        \node[below=0.3cm,accentcyan,font=\small] at (l2) {Hidden};
+        \node[below=0.3cm,accentcyan,font=\small] at (l3) {Hidden};
+        \node[below=0.3cm,neonpink,font=\small] at (l4) {Output};
+    \end{tikzpicture}
+    
+    \vspace{0.3cm}
+    
+    \[
+        \hat{y} = (f_4 \circ f_3 \circ f_2 \circ f_1)(x) = f_4(f_3(f_2(f_1(x))))
+    \]
+    
+    \vspace{0.2cm}
+    
+    Where each $f_i(x) = \sigma(W_ix + b_i)$ is a simple layer operation!
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Inverse Functions
+% -----------------------------------------------------------------------------
+\begin{frame}{Inverse Functions}
+    \begin{defbox}[Inverse Function]
+        If $f: A \rightarrow B$, the \glow{inverse} $f^{-1}: B \rightarrow A$ satisfies:
+        \[
+            f^{-1}(f(x)) = x \quad \text{and} \quad f(f^{-1}(y)) = y
+        \]
+        
+        The inverse ``undoes'' what the function does.
+    \end{defbox}
+    
+    \vspace{0.3cm}
+    
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \textbf{Examples:}
+            \begin{itemize}
+                \item $f(x) = x + 3 \Rightarrow f^{-1}(x) = x - 3$
+                \item $f(x) = 2x \Rightarrow f^{-1}(x) = \frac{x}{2}$
+                \item $f(x) = e^x \Rightarrow f^{-1}(x) = \ln(x)$
+                \item $f(x) = x^2 \Rightarrow f^{-1}(x) = \sqrt{x}$ (for $x \geq 0$)
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.6]
+                \draw[<->,softgray] (-0.5,0) -- (3,0) node[right] {$x$};
+                \draw[<->,softgray] (0,-0.5) -- (0,3) node[above] {$y$};
+                
+                % y = x line
+                \draw[softgray,dashed] (0,0) -- (2.5,2.5);
+                
+                % f(x) = e^x (scaled)
+                \draw[accentcyan,thick,domain=0:1.2,smooth] plot (\x,{exp(\x)/1.5});
+                
+                % f^{-1}(x) = ln(x) (scaled)
+                \draw[neonpink,thick,domain=0.7:2.7,smooth] plot (\x,{ln(\x*1.5)});
+                
+                \node[accentcyan,right,font=\small] at (1.2,1.8) {$e^x$};
+                \node[neonpink,below,font=\small] at (2.5,0.8) {$\ln x$};
+            \end{tikzpicture}
+            
+            {\small Inverse reflects across $y = x$}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Key Takeaways
+% -----------------------------------------------------------------------------
+\begin{frame}{Key Takeaways: Functions \& Parameters}
+    \begin{keybox}
+        \begin{enumerate}
+            \item A \textbf{function} maps inputs to outputs: $f: A \rightarrow B$
+            \item \textbf{Domain} = valid inputs, \textbf{Range} = actual outputs
+            \item \textbf{Variables} ($x$) = inputs that vary
+            \item \textbf{Parameters} ($\theta$) = constants that control behavior
+            \item In ML: $x$ = data, $\theta$ = what we \textbf{learn}!
+            \item \textbf{Composition}: $(f \circ g)(x) = f(g(x))$
+            \item Neural networks = composed functions with learnable parameters
+            \item \textbf{Inverse} $f^{-1}$ undoes the function
+        \end{enumerate}
+    \end{keybox}
+    
+    \vspace{0.2cm}
+    
+    \centering
+    \textit{Next: Limits — the foundation of calculus!}
+\end{frame}

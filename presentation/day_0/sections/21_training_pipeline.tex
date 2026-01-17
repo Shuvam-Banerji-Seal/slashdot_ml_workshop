@@ -1,0 +1,417 @@
+% =============================================================================
+% Section 21: Neural Network Training Pipeline
+% Putting it all together - the complete training loop
+% =============================================================================
+
+\section{Training Pipeline}
+
+% -----------------------------------------------------------------------------
+% Opening
+% -----------------------------------------------------------------------------
+\begin{frame}{The Complete Training Pipeline}
+    \begin{funnybox}
+        \textit{``We've learned all the ingredients. Now it's time to bake the neural network cake! CAKE''}
+    \end{funnybox}
+    
+    \vspace{0.3cm}
+    
+    \begin{keybox}[The Training Recipe]
+        \begin{enumerate}
+            \item \textbf{Data}: Load, preprocess, batch
+            \item \textbf{Model}: Define architecture
+            \item \textbf{Loss}: Choose objective function
+            \item \textbf{Optimizer}: Select update rule
+            \item \textbf{Train}: Forward → Loss → Backward → Update
+            \item \textbf{Evaluate}: Test set performance
+            \item \textbf{Save}: Checkpoint best model
+        \end{enumerate}
+    \end{keybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Pipeline Overview
+% -----------------------------------------------------------------------------
+\begin{frame}{Training Pipeline Overview}
+    \centering
+    \begin{tikzpicture}[
+        node distance=0.8cm,
+        box/.style={rectangle,draw,thick,rounded corners,minimum width=2cm,minimum height=0.7cm,font=\small},
+        arrow/.style={->,thick}
+    ]
+        % Nodes - using text=black for contrast on light backgrounds
+        \node[box,fill=neongreen!20,draw=neongreen,text=black] (data) {Data};
+        \node[box,fill=accentcyan!20,draw=accentcyan,text=black,right=of data] (model) {Model};
+        \node[box,fill=neonpink!20,draw=neonpink,text=black,right=of model] (forward) {Forward};
+        \node[box,fill=neonyellow!20,draw=neonyellow,text=black,right=of forward] (loss) {Loss};
+        
+        \node[box,fill=neonpink!20,draw=neonpink,text=black,below=of loss] (backward) {Backward};
+        \node[box,fill=accentcyan!20,draw=accentcyan,text=black,below=of forward] (update) {Update};
+        \node[box,fill=neongreen!20,draw=neongreen,text=black,below=of model] (eval) {Evaluate};
+        \node[box,fill=neonyellow!20,draw=neonyellow,text=black,below=of data] (save) {Save};
+        
+        % Arrows
+        \draw[arrow,neongreen] (data) -- (model);
+        \draw[arrow,accentcyan] (model) -- (forward);
+        \draw[arrow,neonpink] (forward) -- (loss);
+        \draw[arrow,neonyellow] (loss) -- (backward);
+        \draw[arrow,neonpink] (backward) -- (update);
+        \draw[arrow,accentcyan] (update) -- (eval);
+        \draw[arrow,neongreen] (eval) -- (save);
+        
+        % Loop back
+        \draw[arrow,dashed,neonyellow] (update.west) -- ++(-0.5,0) |- (data.south);
+        \node[font=\tiny,neonyellow] at (-1.5,-0.8) {next batch};
+    \end{tikzpicture}
+    
+    \vspace{0.3cm}
+    
+    \begin{infobox}
+        \textbf{Epoch}: One pass through entire training set
+        
+        \textbf{Iteration/Step}: One batch update
+    \end{infobox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% The Training Loop
+% -----------------------------------------------------------------------------
+\begin{frame}{The Training Loop}
+    \begin{successbox}[PyTorch Training Loop]
+        {\scriptsize\ttfamily
+        def train\_epoch(model, loader, criterion, optimizer, device):\\
+        \quad model.train() \# Set to training mode\\
+        \quad total\_loss = 0\\
+        \quad correct = 0\\[0.2em]
+        \quad for batch\_idx, (data, target) in enumerate(loader):\\
+        \quad\quad data, target = data.to(device), target.to(device)\\[0.2em]
+        \quad\quad optimizer.zero\_grad() \# Clear gradients\\
+        \quad\quad output = model(data) \# Forward pass\\
+        \quad\quad loss = criterion(output, target)\\
+        \quad\quad loss.backward() \# Backward pass\\
+        \quad\quad optimizer.step() \# Update weights\\[0.2em]
+        \quad\quad total\_loss += loss.item()\\
+        \quad\quad pred = output.argmax(dim=1)\\
+        \quad\quad correct += (pred == target).sum().item()\\[0.2em]
+        \quad return total\_loss / len(loader), correct / len(loader.dataset)
+        }
+    \end{successbox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Training vs Evaluation Mode
+% -----------------------------------------------------------------------------
+\begin{frame}{Training vs Evaluation Mode}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{defbox}[\texttt{model.train()}]
+                \begin{itemize}
+                    \item Dropout \textbf{active}
+                    \item BatchNorm uses \textbf{batch} statistics
+                    \item Gradients computed
+                \end{itemize}
+                
+                \vspace{0.2cm}
+                
+                Use during: \textbf{Training}
+            \end{defbox}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{defbox}[\texttt{model.eval()}]
+                \begin{itemize}
+                    \item Dropout \textbf{disabled}
+                    \item BatchNorm uses \textbf{running} statistics
+                    \item Can disable gradient computation
+                \end{itemize}
+                
+                \vspace{0.2cm}
+                
+                Use during: \textbf{Validation/Test}
+            \end{defbox}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.3cm}
+    
+    \begin{alertbox}[Common Mistake!]
+        Forgetting to switch between train/eval mode is a very common bug!
+        
+        Always call \texttt{model.eval()} before testing and \texttt{model.train()} before training.
+    \end{alertbox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Evaluation Loop
+% -----------------------------------------------------------------------------
+\begin{frame}{The Evaluation Loop}
+    \begin{successbox}[PyTorch Evaluation]
+        {\scriptsize\ttfamily
+        @torch.no\_grad() \# Disable gradient computation\\
+        def evaluate(model, loader, criterion, device):\\
+        \quad model.eval() \# Set to evaluation mode\\
+        \quad total\_loss = 0\\
+        \quad correct = 0\\[0.2em]
+        \quad for data, target in loader:\\
+        \quad\quad data, target = data.to(device), target.to(device)\\
+        \quad\quad output = model(data)\\
+        \quad\quad loss = criterion(output, target)\\
+        \quad\quad total\_loss += loss.item()\\
+        \quad\quad pred = output.argmax(dim=1)\\
+        \quad\quad correct += (pred == target).sum().item()\\[0.2em]
+        \quad accuracy = correct / len(loader.dataset)\\
+        \quad avg\_loss = total\_loss / len(loader)\\
+        \quad return avg\_loss, accuracy
+        }
+    \end{successbox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Complete Training Script
+% -----------------------------------------------------------------------------
+\begin{frame}{Complete Training Script}
+    \begin{successbox}[Full Training Pipeline]
+        {\scriptsize\ttfamily
+        device = torch.device('cuda' if torch.cuda.is\_available() else 'cpu')\\
+        model = MNISTClassifier().to(device)\\
+        criterion = nn.CrossEntropyLoss()\\
+        optimizer = torch.optim.Adam(model.parameters(), lr=0.001)\\
+        scheduler = torch.optim.lr\_scheduler.StepLR(optimizer, step\_size=5, gamma=0.5)\\[0.2em]
+        best\_acc = 0\\
+        for epoch in range(num\_epochs):\\
+        \quad train\_loss, train\_acc = train\_epoch(model, train\_loader,\\
+        \quad\quad\quad\quad\quad\quad\quad\quad\quad\quad criterion, optimizer, device)\\
+        \quad val\_loss, val\_acc = evaluate(model, val\_loader, criterion, device)\\
+        \quad scheduler.step()\\
+        \quad print(f'Epoch \{epoch\}: Train Loss=\{train\_loss:.4f\}, Val Acc=\{val\_acc:.4f\}')\\[0.2em]
+        \quad if val\_acc > best\_acc:\\
+        \quad\quad best\_acc = val\_acc\\
+        \quad\quad torch.save(model.state\_dict(), 'best\_model.pth')
+        }
+    \end{successbox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Monitoring Training
+% -----------------------------------------------------------------------------
+\begin{frame}{Monitoring Training Progress}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \centering
+            \textbf{Loss Curves}
+            
+            \begin{tikzpicture}[scale=0.65]
+                \draw[->] (0,0) -- (5,0) node[right] {epoch};
+                \draw[->] (0,0) -- (0,3.5) node[above] {loss};
+                
+                % Training loss
+                \draw[thick,neongreen,domain=0:4.5,samples=50] 
+                    plot (\x, {2.5*exp(-0.5*\x) + 0.3});
+                \node[neongreen,font=\tiny,right] at (4.5,0.5) {train};
+                
+                % Validation loss (with some overfitting)
+                \draw[thick,neonpink,domain=0:4.5,samples=50] 
+                    plot (\x, {2.7*exp(-0.4*\x) + 0.4 + 0.1*\x});
+                \node[neonpink,font=\tiny,right] at (4.5,1.2) {val};
+            \end{tikzpicture}
+            
+            \begin{keybox}[Watch For]
+                \begin{itemize}
+                    \item Val loss increasing → overfitting
+                    \item Loss plateau → lower LR
+                    \item Loss spikes → LR too high
+                \end{itemize}
+            \end{keybox}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \centering
+            \textbf{Accuracy Curves}
+            
+            \begin{tikzpicture}[scale=0.65]
+                \draw[->] (0,0) -- (5,0) node[right] {epoch};
+                \draw[->] (0,0) -- (0,3.5) node[above] {acc};
+                
+                % Training accuracy
+                \draw[thick,neongreen,domain=0:4.5,samples=50] 
+                    plot (\x, {3*(1-exp(-0.8*\x))});
+                \node[neongreen,font=\tiny,right] at (4.5,2.9) {train};
+                
+                % Validation accuracy
+                \draw[thick,neonpink,domain=0:4.5,samples=50] 
+                    plot (\x, {2.5*(1-exp(-0.7*\x))});
+                \node[neonpink,font=\tiny,right] at (4.5,2.3) {val};
+                
+                % Gap indicating overfitting
+                \draw[<->,dashed,neonyellow] (4,2.85) -- (4,2.2);
+                \node[neonyellow,font=\tiny,right] at (4.1,2.5) {gap};
+            \end{tikzpicture}
+            
+            \begin{infobox}[Gap = Overfitting]
+                Large train-val gap means model memorizing, not learning!
+            \end{infobox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Checkpointing
+% -----------------------------------------------------------------------------
+\begin{frame}{Saving and Loading Models}
+    \begin{successbox}[Model Checkpointing]
+        {\scriptsize\ttfamily
+        \# Save model weights only\\
+        torch.save(model.state\_dict(), 'model\_weights.pth')\\[0.2em]
+        \# Load weights\\
+        model = MNISTClassifier()\\
+        model.load\_state\_dict(torch.load('model\_weights.pth'))\\[0.2em]
+        \# Save complete checkpoint (for resuming training)\\
+        checkpoint = \{\\
+        \quad 'epoch': epoch,\\
+        \quad 'model\_state\_dict': model.state\_dict(),\\
+        \quad 'optimizer\_state\_dict': optimizer.state\_dict(),\\
+        \quad 'loss': loss,\\
+        \quad 'best\_acc': best\_acc\\
+        \}\\
+        torch.save(checkpoint, 'checkpoint.pth')\\[0.2em]
+        \# Load and resume\\
+        checkpoint = torch.load('checkpoint.pth')\\
+        model.load\_state\_dict(checkpoint['model\_state\_dict'])\\
+        optimizer.load\_state\_dict(checkpoint['optimizer\_state\_dict'])
+        }
+    \end{successbox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Best Practices
+% -----------------------------------------------------------------------------
+\begin{frame}{Training Best Practices}
+    \begin{keybox}[Tips for Successful Training]
+        \begin{enumerate}
+            \item \textbf{Start simple}: Small model, verify it can overfit one batch
+            \item \textbf{Monitor everything}: Loss, accuracy, gradients, learning rate
+            \item \textbf{Use validation set}: Never tune on test set!
+            \item \textbf{Checkpoint regularly}: Save best model by validation metric
+            \item \textbf{Reproducibility}: Set random seeds
+            \item \textbf{Normalize data}: Huge impact on training stability
+            \item \textbf{Learning rate}: Often the most important hyperparameter
+        \end{enumerate}
+    \end{keybox}
+    
+    \begin{funnybox}
+        ``If in doubt, lower the learning rate.'' — Ancient ML Wisdom
+    \end{funnybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Debugging Tips
+% -----------------------------------------------------------------------------
+\begin{frame}{Debugging Training Issues}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{alertbox}[Common Problems]
+                \begin{itemize}
+                    \item \textbf{Loss = NaN}
+                    \begin{itemize}
+                        \item LR too high
+                        \item Divide by zero
+                        \item Log of zero
+                    \end{itemize}
+                    \item \textbf{Loss doesn't decrease}
+                    \begin{itemize}
+                        \item LR too low
+                        \item Bug in forward pass
+                        \item Wrong loss function
+                    \end{itemize}
+                    \item \textbf{Overfitting}
+                    \begin{itemize}
+                        \item Add regularization
+                        \item More data
+                        \item Smaller model
+                    \end{itemize}
+                \end{itemize}
+            \end{alertbox}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{successbox}[Debugging Checklist]
+                \begin{enumerate}
+                    \item Can model overfit 1 batch?
+                    \item Are labels correct?
+                    \item Is data normalized?
+                    \item Are gradients flowing?
+                    \item Is loss function appropriate?
+                    \item Is train/eval mode correct?
+                    \item Are shapes matching?
+                \end{enumerate}
+            \end{successbox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Key Takeaways
+% -----------------------------------------------------------------------------
+\begin{frame}{Key Takeaways: Training Pipeline}
+    \begin{keybox}
+        \begin{enumerate}
+            \item \textbf{Training loop}: Forward → Loss → Backward → Update
+            \item \textbf{Modes}: Always toggle train/eval appropriately
+            \item \textbf{Evaluation}: Use \texttt{@torch.no\_grad()} for efficiency
+            \item \textbf{Monitoring}: Track train \& val loss/accuracy
+            \item \textbf{Checkpointing}: Save best model, enable resuming
+            \item \textbf{Best practices}:
+            \begin{itemize}
+                \item Start simple, verify overfitting
+                \item Never tune on test set
+                \item Learning rate is crucial
+            \end{itemize}
+        \end{enumerate}
+    \end{keybox}
+    
+    \centering
+    \vspace{0.3cm}
+    {\Large \textbf{Congratulations! You've completed Day 0! PARTY}}
+    
+    \vspace{0.2cm}
+    
+    \textit{Next: Day 1 — Hands-on implementation and advanced topics!}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Workshop Summary
+% -----------------------------------------------------------------------------
+\begin{frame}{Day 0 Summary: The Journey So Far}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{keybox}[Mathematical Foundations]
+                \begin{itemize}
+                    \item Numbers \& counting
+                    \item Real \& complex numbers
+                    \item Functions \& parameters
+                    \item Limits \& continuity
+                    \item Differentiation
+                    \item Integration
+                    \item Graph theory
+                \end{itemize}
+            \end{keybox}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{keybox}[Machine Learning]
+                \begin{itemize}
+                    \item Neural network basics
+                    \item Forward propagation
+                    \item Loss functions
+                    \item Backpropagation
+                    \item Optimization algorithms
+                    \item Regularization
+                    \item Decision trees \& boosting
+                    \item Statistical learning
+                    \item Information theory
+                \end{itemize}
+            \end{keybox}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.3cm}
+    
+    \begin{successbox}
+        You now have the foundation to understand, implement, and debug neural networks from scratch!
+    \end{successbox}
+\end{frame}

@@ -1,0 +1,269 @@
+% =============================================================================
+% ML Workshop - Day 0: From Numbers to Neural Networks
+% Author: Shuvam Banerji Seal
+% A comprehensive journey from counting numbers to machine learning
+% =============================================================================
+\documentclass[aspectratio=169,9pt]{beamer}
+
+% Load our custom dark theme
+\usepackage{../global/sbs_dark_beamer}
+
+% Additional packages for this presentation
+\usepackage{animate}
+\usepackage{media9}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepgfplotslibrary{fillbetween}
+
+% For neural network diagrams
+\usetikzlibrary{positioning,arrows.meta,calc,decorations.markings,shapes.geometric}
+
+% =============================================================================
+% DOCUMENT METADATA
+% =============================================================================
+\title{From Numbers to Neural Networks}
+\subtitle{A Mathematical Journey into Machine Learning}
+
+% Add author using the custom author system
+\addauthor{Shuvam Banerji Seal}{Slashdot - The Programming Club}{sbs22ms076@iiserkol.ac.in}
+
+\date{ML Workshop 2026}
+
+% Short versions for footer (use renewcommand for beamer-defined commands)
+\renewcommand{\insertshorttitle}{Numbers to Neural Networks}
+\renewcommand{\insertshortauthor}{SBS}
+\renewcommand{\insertshortdate}{2026}
+
+% =============================================================================
+% CUSTOM COMMANDS FOR THIS PRESENTATION
+% =============================================================================
+
+% Funny quote boxes
+\newtcolorbox{funnybox}[1][]{
+    enhanced,
+    colback=bgdark,
+    colframe=neonyellow,
+    coltext=fgwhite,
+    coltitle=bgblack,
+    colbacktitle=neonyellow,
+    fonttitle=\bfseries\small,
+    title={Fun Fact},
+    attach boxed title to top left={yshift=-1.5mm,xshift=3mm},
+    boxed title style={arc=1.5mm,boxrule=0pt,colback=neonyellow},
+    boxrule=0.8pt,
+    arc=2mm,
+    left=2mm,right=2mm,top=2mm,bottom=2mm,
+    drop fuzzy shadow=black,
+    fontupper=\small,
+    #1
+}
+
+% Definition boxes
+\newtcolorbox{defbox}[1][Definition]{
+    enhanced,
+    colback=darkgray,
+    colframe=accentcyan,
+    coltext=fgwhite,
+    coltitle=bgblack,
+    colbacktitle=accentcyan,
+    fonttitle=\bfseries\small,
+    title={#1},
+    attach boxed title to top left={yshift=-1.5mm,xshift=3mm},
+    boxed title style={arc=1.5mm,boxrule=0pt,colback=accentcyan},
+    boxrule=0.8pt,
+    arc=2mm,
+    left=2mm,right=2mm,top=2mm,bottom=2mm,
+    drop fuzzy shadow=black,
+    fontupper=\small
+}
+
+% Theorem boxes
+\newtcolorbox{thmbox}[1][Theorem]{
+    enhanced,
+    colback=darkgray,
+    colframe=neongreen,
+    coltext=fgwhite,
+    coltitle=bgblack,
+    colbacktitle=neongreen,
+    fonttitle=\bfseries\small,
+    title={#1},
+    attach boxed title to top left={yshift=-1.5mm,xshift=3mm},
+    boxed title style={arc=1.5mm,boxrule=0pt,colback=neongreen},
+    boxrule=0.8pt,
+    arc=2mm,
+    left=2mm,right=2mm,top=2mm,bottom=2mm,
+    drop fuzzy shadow=black,
+    fontupper=\small
+}
+
+% Key takeaway boxes
+\newtcolorbox{keybox}[1][Key Takeaway]{
+    enhanced,
+    colback=darkgray,
+    colframe=neonpink,
+    coltext=fgwhite,
+    coltitle=bgblack,
+    colbacktitle=neonpink,
+    fonttitle=\bfseries\small,
+    title={#1},
+    attach boxed title to top left={yshift=-1.5mm,xshift=3mm},
+    boxed title style={arc=1.5mm,boxrule=0pt,colback=neonpink},
+    boxrule=0.8pt,
+    arc=2mm,
+    left=2mm,right=2mm,top=2mm,bottom=2mm,
+    drop fuzzy shadow=black,
+    fontupper=\small
+}
+
+% Neural network node styles - Darker, more saturated colors
+\tikzset{
+    neuron/.style={
+        circle,
+        draw=accentcyan,
+        fill=accentcyan!25!darkgray,
+        minimum size=0.7cm,
+        line width=1pt,
+        font=\scriptsize,
+        text=fgwhite
+    },
+    input neuron/.style={neuron, draw=neongreen, fill=neongreen!30!darkgray, text=fgwhite},
+    hidden neuron/.style={neuron, draw=accentcyan, fill=accentcyan!30!darkgray, text=fgwhite},
+    output neuron/.style={neuron, draw=neonpink, fill=neonpink!30!darkgray, text=fgwhite},
+    connection/.style={->,>=stealth,line width=0.6pt,draw=softgray!80},
+    strong connection/.style={connection, draw=accentcyan, line width=1.2pt}
+}
+
+% TikZ default text color for contrast - use white on dark backgrounds
+\tikzset{
+    every node/.append style={font=\footnotesize, text=fgwhite},
+    darktext/.style={text=tikztext},
+    lighttext/.style={text=fgwhite}
+}
+
+% =============================================================================
+% BEGIN DOCUMENT
+% =============================================================================
+\begin{document}
+
+% Title page
+\begin{frame}[plain]
+    \titlepage
+\end{frame}
+
+% Table of Contents
+\tocframe
+
+% =============================================================================
+% PART I: MATHEMATICAL FOUNDATIONS
+% =============================================================================
+
+% Section 1: Numbers & Counting
+\input{sections/01_numbers}
+
+% Section 2: Real & Complex Numbers
+\input{sections/02_reals_complex}
+
+% Section 3: Functions & Parameters
+\input{sections/03_functions}
+
+% Section 4: Limits
+\input{sections/04_limits}
+
+% Section 5: Differentiation
+\input{sections/05_differentiation}
+
+% Section 6: Integration
+\input{sections/06_integration}
+
+% =============================================================================
+% PART II: FOUNDATIONS FOR ML
+% =============================================================================
+
+% Section 7: Graph Theory Basics
+\input{sections/07_graph_theory}
+
+% Section 8: Python Environment Setup (MOVED HERE - before NN)
+\input{sections/08_python_setup}
+
+% =============================================================================
+% PART III: NEURAL NETWORKS
+% =============================================================================
+
+% Section 9: Neural Networks Introduction
+\input{sections/09_neural_intro}
+
+% Section 10: Neural Network Architectures
+\input{sections/10_neural_arch}
+
+% Section 11: Forward Propagation
+\input{sections/11_forward_prop}
+
+% Section 12: Loss Functions
+\input{sections/12_loss_functions}
+
+% Section 13: Backpropagation
+\input{sections/13_backprop}
+
+% Section 14: Optimization Algorithms
+\input{sections/14_optimization}
+
+% Section 15: Regularization Techniques
+\input{sections/15_regularization}
+
+% =============================================================================
+% PART IV: CLASSICAL ML & THEORY
+% =============================================================================
+
+% Section 16: Decision Trees
+\input{sections/16_decision_trees}
+
+% Section 17: Ensemble Methods & Boosting
+\input{sections/17_boosting}
+
+% Section 18: Statistical Learning Theory
+\input{sections/18_stat_learning}
+
+% Section 19: KL Divergence & Information Theory
+\input{sections/19_kl_divergence}
+
+% =============================================================================
+% PART V: PUTTING IT ALL TOGETHER
+% =============================================================================
+
+% Section 20: MNIST Dataset
+\input{sections/20_mnist}
+
+% Section 21: Neural Network Training Pipeline
+\input{sections/21_training_pipeline}
+
+% =============================================================================
+% CLOSING
+% =============================================================================
+
+\begin{frame}[plain]
+    \begin{tikzpicture}[remember picture,overlay]
+        \shade[top color=bgdark,bottom color=bgblack]
+            (current page.north west) rectangle (current page.south east);
+    \end{tikzpicture}
+    \centering
+    \vfill
+    \glowtitle[accentcyan]{Thank You!}
+    \vspace{1cm}
+    
+    {\Large\color{fgwhite}Questions?}
+    
+    \vspace{1cm}
+    
+    \begin{tikzpicture}
+        \shade[left color=bgblack,right color=bgblack,middle color=neonpink]
+            (-4cm,0) rectangle (4cm,1pt);
+    \end{tikzpicture}
+    
+    \vspace{0.5cm}
+    
+    {\color{softgray}\small Shuvam Banerji Seal | ML Workshop 2026}
+    
+    \vfill
+\end{frame}
+
+\end{document}

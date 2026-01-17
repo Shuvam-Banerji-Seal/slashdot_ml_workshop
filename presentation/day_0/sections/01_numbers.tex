@@ -1,0 +1,457 @@
+% =============================================================================
+% Section 1: Foundations of Numbers
+% From counting sheep to conquering mathematics
+% =============================================================================
+
+\section{Foundations of Numbers}
+
+% -----------------------------------------------------------------------------
+% Opening Slide
+% -----------------------------------------------------------------------------
+\begin{frame}{The Story of Numbers}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{funnybox}
+                \textit{``In the beginning, there was 1. Then someone wanted more pizza, and mathematics was born.''}
+            \end{funnybox}
+            \vspace{0.5cm}
+            \textbf{Our Journey:}
+            \begin{itemize}
+                \item Natural numbers $\mathbb{N}$
+                \item Integers $\mathbb{Z}$
+                \item Rational numbers $\mathbb{Q}$
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.8]
+                % Nested sets visualization
+                \fill[neonpink!20] (0,0) ellipse (3.5cm and 2.5cm);
+                \fill[accentcyan!20] (0,0) ellipse (2.5cm and 1.8cm);
+                \fill[neongreen!20] (0,0) ellipse (1.5cm and 1cm);
+                
+                \draw[neonpink,thick] (0,0) ellipse (3.5cm and 2.5cm);
+                \draw[accentcyan,thick] (0,0) ellipse (2.5cm and 1.8cm);
+                \draw[neongreen,thick] (0,0) ellipse (1.5cm and 1cm);
+                
+                \node[neongreen] at (0,0) {$\mathbb{N}$};
+                \node[accentcyan] at (0,-1.4) {$\mathbb{Z}$};
+                \node[neonpink] at (0,-2.2) {$\mathbb{Q}$};
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Natural Numbers - Intuition
+% -----------------------------------------------------------------------------
+\begin{frame}{Natural Numbers $\mathbb{N}$: The Universe's Original Counting App}
+    \begin{columns}[T]
+        \begin{column}{0.55\textwidth}
+            \begin{defbox}[Natural Numbers]
+                The \glow{natural numbers} are the counting numbers:
+                \[
+                    \mathbb{N} = \{1, 2, 3, 4, 5, \ldots\}
+                \]
+                Some mathematicians include 0, giving $\mathbb{N}_0 = \{0, 1, 2, \ldots\}$
+            \end{defbox}
+            
+            \vspace{0.3cm}
+            
+            \textbf{Cave Person Math:}
+            \begin{itemize}
+                \item SHEEP One sheep
+                \item SHEEPSHEEP Two sheep
+                \item SHEEPSHEEPSHEEP Three sheep... \textit{zzz}
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.45\textwidth}
+            \centering
+            \begin{tikzpicture}
+                % Number line
+                \draw[->,thick,accentcyan] (0,0) -- (5,0);
+                \foreach \x in {1,2,3,4} {
+                    \fill[neongreen] (\x,0) circle (3pt);
+                    \node[below,fgwhite] at (\x,-0.2) {\x};
+                }
+                \node[above,accentcyan] at (2.5,0.3) {$\mathbb{N}$};
+                
+                % Dots indicating continuation
+                \node[fgwhite] at (4.5,0) {$\cdots$};
+            \end{tikzpicture}
+            
+            \vspace{0.5cm}
+            
+            \begin{funnybox}
+                ``Counting: so easy a caveman did it!''
+            \end{funnybox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Peano Axioms
+% -----------------------------------------------------------------------------
+\begin{frame}{Peano Axioms: Making Counting Rigorous}
+    \begin{thmbox}[Peano Axioms (1889)]
+        The natural numbers satisfy:
+        \begin{enumerate}
+            \item $1 \in \mathbb{N}$ \hfill \textit{(1 exists)}
+            \item $\forall n \in \mathbb{N}: S(n) \in \mathbb{N}$ \hfill \textit{(every number has a successor)}
+            \item $\forall n \in \mathbb{N}: S(n) \neq 1$ \hfill \textit{(1 is not a successor)}
+            \item $S(n) = S(m) \Rightarrow n = m$ \hfill \textit{(successors are unique)}
+            \item \textbf{Induction axiom} \hfill \textit{(if true for 1 and $n \Rightarrow n+1$, true for all)}
+        \end{enumerate}
+    \end{thmbox}
+    
+    \vspace{0.3cm}
+    
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.9]
+                \node[circle,draw=neongreen,fill=darkgray,minimum size=0.8cm] (1) at (0,0) {1};
+                \node[circle,draw=accentcyan,fill=darkgray,minimum size=0.8cm] (2) at (1.5,0) {2};
+                \node[circle,draw=accentcyan,fill=darkgray,minimum size=0.8cm] (3) at (3,0) {3};
+                \node[circle,draw=accentcyan,fill=darkgray,minimum size=0.8cm] (4) at (4.5,0) {4};
+                \node[fgwhite] at (5.5,0) {$\cdots$};
+                
+                \draw[->,neonpink,thick] (1) -- (2) node[midway,above,font=\tiny] {$S$};
+                \draw[->,neonpink,thick] (2) -- (3) node[midway,above,font=\tiny] {$S$};
+                \draw[->,neonpink,thick] (3) -- (4) node[midway,above,font=\tiny] {$S$};
+            \end{tikzpicture}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{funnybox}
+                Giuseppe Peano basically said: ``Here's how to count. You're welcome, humanity.''
+            \end{funnybox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Properties of Natural Numbers
+% -----------------------------------------------------------------------------
+\begin{frame}{Properties of Natural Numbers}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{defbox}[Closure Properties]
+                For all $a, b \in \mathbb{N}$:
+                \begin{align*}
+                    a + b &\in \mathbb{N} \quad \checkmark \\
+                    a \times b &\in \mathbb{N} \quad \checkmark \\
+                    a - b &\in \mathbb{N} \quad \textcolor{neonpink}{\times} \\
+                    a \div b &\in \mathbb{N} \quad \textcolor{neonpink}{\times}
+                \end{align*}
+            \end{defbox}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{alertbox}[The Problem]
+                What is $3 - 5$? 
+                
+                \vspace{0.2cm}
+                
+                Natural numbers can't handle this! We need... \glow{negative numbers}!
+            \end{alertbox}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.5cm}
+    
+    \centering
+    \begin{tikzpicture}
+        \node[fgwhite] at (0,0) {$5 - 3 = 2$ \textcolor{neongreen}{\checkmark}};
+        \node[fgwhite] at (4,0) {$3 - 5 = $ \textcolor{neonpink}{???}};
+    \end{tikzpicture}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Integers
+% -----------------------------------------------------------------------------
+\begin{frame}{Integers $\mathbb{Z}$: When Mathematicians Discovered Debt}
+    \begin{columns}[T]
+        \begin{column}{0.55\textwidth}
+            \begin{defbox}[Integers]
+                The \glow{integers} extend natural numbers with negatives and zero:
+                \[
+                    \mathbb{Z} = \{\ldots, -3, -2, -1, 0, 1, 2, 3, \ldots\}
+                \]
+            \end{defbox}
+            
+            \vspace{0.3cm}
+            
+            \textbf{Real-world integers:}
+            \begin{itemize}
+                \item Temperature: $-10°C$ (brrr!)
+                \item Bank account: $-\$500$ (oops!)
+                \item Elevation: $-100m$ (underwater)
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.45\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.7]
+                % Full integer number line
+                \draw[<->,thick,accentcyan] (-3.5,0) -- (3.5,0);
+                \foreach \x in {-3,-2,-1,0,1,2,3} {
+                    \fill[neongreen] (\x,0) circle (3pt);
+                    \node[below,fgwhite,font=\small] at (\x,-0.3) {\x};
+                }
+                \node[above,accentcyan] at (0,0.4) {$\mathbb{Z}$};
+                
+                % Color coding
+                \draw[neonpink,thick,decorate,decoration={brace,amplitude=5pt}] 
+                    (-3,0.5) -- (-0.2,0.5) node[midway,above=5pt,font=\small] {negative};
+                \draw[neongreen,thick,decorate,decoration={brace,amplitude=5pt}] 
+                    (0.2,0.5) -- (3,0.5) node[midway,above=5pt,font=\small] {positive};
+            \end{tikzpicture}
+            
+            \vspace{0.3cm}
+            
+            \begin{funnybox}
+                The name $\mathbb{Z}$ comes from German ``Zahlen'' (numbers). Germans: always precise.
+            \end{funnybox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Integer Properties
+% -----------------------------------------------------------------------------
+\begin{frame}{Integer Properties}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{defbox}[Closure Properties]
+                For all $a, b \in \mathbb{Z}$:
+                \begin{align*}
+                    a + b &\in \mathbb{Z} \quad \checkmark \\
+                    a - b &\in \mathbb{Z} \quad \checkmark \\
+                    a \times b &\in \mathbb{Z} \quad \checkmark \\
+                    a \div b &\in \mathbb{Z} \quad \textcolor{neonpink}{\times}
+                \end{align*}
+            \end{defbox}
+            
+            \vspace{0.3cm}
+            
+            Now $3 - 5 = -2 \in \mathbb{Z}$ \textcolor{neongreen}{\checkmark}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{alertbox}[Still a Problem!]
+                What is $1 \div 2$?
+                
+                \vspace{0.2cm}
+                
+                $\frac{1}{2} = 0.5 \notin \mathbb{Z}$
+                
+                \vspace{0.2cm}
+                
+                We need \glow{fractions}!
+            \end{alertbox}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.5cm}
+    
+    \begin{keybox}
+        Each number system fixes a problem but creates a new one. Mathematics evolves by solving its own limitations!
+    \end{keybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Rational Numbers
+% -----------------------------------------------------------------------------
+\begin{frame}{Rational Numbers $\mathbb{Q}$: Sharing Pizza Among Friends}
+    \begin{columns}[T]
+        \begin{column}{0.55\textwidth}
+            \begin{defbox}[Rational Numbers]
+                The \glow{rational numbers} are all fractions:
+                \[
+                    \mathbb{Q} = \left\{ \frac{p}{q} \;\middle|\; p, q \in \mathbb{Z}, q \neq 0 \right\}
+                \]
+            \end{defbox}
+            
+            \vspace{0.3cm}
+            
+            \textbf{Examples:}
+            \begin{itemize}
+                \item $\frac{1}{2} = 0.5$
+                \item $\frac{22}{7} \approx 3.14159...$
+                \item $\frac{-3}{4} = -0.75$
+                \item $\frac{6}{3} = 2$ (integers are rational too!)
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.45\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.6]
+                % Pizza visualization
+                \fill[neonyellow!30] (0,0) circle (1.5cm);
+                \draw[neonyellow,thick] (0,0) circle (1.5cm);
+                \draw[neonyellow] (0,0) -- (0,1.5);
+                \draw[neonyellow] (0,0) -- (1.5,0);
+                \draw[neonyellow] (0,0) -- (0,-1.5);
+                \draw[neonyellow] (0,0) -- (-1.5,0);
+                
+                \node[fgwhite,font=\small] at (0,-2.2) {$\frac{1}{4}$ each!};
+            \end{tikzpicture}
+            
+            \vspace{0.3cm}
+            
+            \begin{funnybox}
+                ``$\mathbb{Q}$'' for \textbf{Q}uotient. Mathematicians love their abbreviations!
+            \end{funnybox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Density of Rationals
+% -----------------------------------------------------------------------------
+\begin{frame}{The Density of Rational Numbers}
+    \begin{thmbox}[Density of $\mathbb{Q}$]
+        Between \textbf{any} two rational numbers, there exists another rational number.
+        
+        \vspace{0.2cm}
+        
+        If $a, b \in \mathbb{Q}$ with $a < b$, then $\frac{a+b}{2} \in \mathbb{Q}$ and $a < \frac{a+b}{2} < b$.
+    \end{thmbox}
+    
+    \vspace{0.3cm}
+    
+    \centering
+    \begin{tikzpicture}[scale=0.85]
+        % Number line segment
+        \draw[thick,accentcyan] (0,0) -- (6,0);
+        
+        % Points
+        \fill[neongreen] (1,0) circle (3pt) node[below=3pt,fgwhite] {$0$};
+        \fill[neongreen] (5,0) circle (3pt) node[below=3pt,fgwhite] {$1$};
+        
+        % Midpoint
+        \fill[neonyellow] (3,0) circle (3pt) node[below=3pt,fgwhite] {$\frac{1}{2}$};
+        
+        % More midpoints
+        \fill[neonpink] (2,0) circle (2pt) node[below=3pt,fgwhite,font=\tiny] {$\frac{1}{4}$};
+        \fill[neonpink] (4,0) circle (2pt) node[below=3pt,fgwhite,font=\tiny] {$\frac{3}{4}$};
+        
+        % Even more
+        \fill[softgray] (1.5,0) circle (1.5pt);
+        \fill[softgray] (2.5,0) circle (1.5pt);
+        \fill[softgray] (3.5,0) circle (1.5pt);
+        \fill[softgray] (4.5,0) circle (1.5pt);
+    \end{tikzpicture}
+    
+    \vspace{0.3cm}
+    
+    \begin{funnybox}
+        There are \textbf{infinitely many} rationals between any two rationals. Mind = blown! MINDBLOWN
+    \end{funnybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% But Wait - Irrationals Preview
+% -----------------------------------------------------------------------------
+\begin{frame}{But Wait... Are Rationals Enough?}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{alertbox}[The Pythagorean Nightmare]
+                Consider a square with side 1:
+                
+                \vspace{0.3cm}
+                
+                \centering
+                \begin{tikzpicture}[scale=1.0]
+                    \draw[accentcyan,thick] (0,0) -- (1,0) -- (1,1) -- (0,1) -- cycle;
+                    \draw[neonpink,thick] (0,0) -- (1,1);
+                    
+                    \node[below,fgwhite,font=\small] at (0.5,0) {1};
+                    \node[left,fgwhite,font=\small] at (0,0.5) {1};
+                    \node[above right,neonpink,font=\small] at (0.5,0.5) {$\sqrt{2}$};
+                \end{tikzpicture}
+                
+                \vspace{0.3cm}
+                
+                By Pythagoras: $d^2 = 1^2 + 1^2 = 2$
+                
+                So $d = \sqrt{2}$... but is $\sqrt{2} \in \mathbb{Q}$?
+            \end{alertbox}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{infobox}[Spoiler Alert]
+                $\sqrt{2}$ is \textbf{NOT} rational!
+                
+                \vspace{0.2cm}
+                
+                There exist numbers that \textbf{cannot} be written as $\frac{p}{q}$.
+                
+                \vspace{0.2cm}
+                
+                These are called \glow[neonpink]{irrational numbers}.
+                
+                \vspace{0.2cm}
+                
+                Coming up next: Real numbers $\mathbb{R}$!
+            \end{infobox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Number Hierarchy Summary
+% -----------------------------------------------------------------------------
+\begin{frame}{The Number Hierarchy}
+    \centering
+    \begin{tikzpicture}[scale=0.9]
+        % Nested sets with better visualization
+        \fill[neonpink!10] (0,0) ellipse (5cm and 3cm);
+        \fill[accentcyan!15] (0,0) ellipse (3.5cm and 2.2cm);
+        \fill[neonyellow!15] (0,0) ellipse (2.2cm and 1.4cm);
+        \fill[neongreen!20] (0,0) ellipse (1cm and 0.7cm);
+        
+        \draw[neonpink,thick] (0,0) ellipse (5cm and 3cm);
+        \draw[accentcyan,thick] (0,0) ellipse (3.5cm and 2.2cm);
+        \draw[neonyellow,thick] (0,0) ellipse (2.2cm and 1.4cm);
+        \draw[neongreen,thick] (0,0) ellipse (1cm and 0.7cm);
+        
+        % Labels
+        \node[neongreen,font=\bfseries] at (0,0) {$\mathbb{N}$};
+        \node[neonyellow,font=\bfseries] at (0,-1.1) {$\mathbb{Z}$};
+        \node[accentcyan,font=\bfseries] at (0,-1.9) {$\mathbb{Q}$};
+        \node[neonpink,font=\bfseries] at (0,-2.7) {$\mathbb{R}$};
+        
+        % Side labels
+        \node[neongreen,right,font=\small] at (1.2,0) {Natural: $1, 2, 3, \ldots$};
+        \node[neonyellow,right,font=\small] at (2.4,-0.5) {Integers: $\ldots, -1, 0, 1, \ldots$};
+        \node[accentcyan,right,font=\small] at (3.7,-1) {Rationals: $\frac{p}{q}$};
+        \node[neonpink,right,font=\small] at (5.2,-1.5) {Reals: $\sqrt{2}, \pi, e$};
+    \end{tikzpicture}
+    
+    \vspace{0.3cm}
+    
+    \[
+        \mathbb{N} \subset \mathbb{Z} \subset \mathbb{Q} \subset \mathbb{R}
+    \]
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Key Takeaways
+% -----------------------------------------------------------------------------
+\begin{frame}{Key Takeaways: Numbers}
+    \begin{keybox}
+        \begin{enumerate}
+            \item \textbf{Natural numbers} $\mathbb{N}$: Counting (1, 2, 3, ...)
+            \item \textbf{Integers} $\mathbb{Z}$: Add zero and negatives (..., -1, 0, 1, ...)
+            \item \textbf{Rationals} $\mathbb{Q}$: All fractions $\frac{p}{q}$
+            \item Each extension solves a problem:
+            \begin{itemize}
+                \item $\mathbb{Z}$ allows subtraction
+                \item $\mathbb{Q}$ allows division
+            \end{itemize}
+            \item Rationals are \textbf{dense} but not \textbf{complete}
+            \item Some numbers (like $\sqrt{2}$) are \textbf{irrational}
+        \end{enumerate}
+    \end{keybox}
+    
+    \vspace{0.3cm}
+    
+    \centering
+    \textit{Next: Real and Complex Numbers — where it gets \glow{really} interesting!}
+\end{frame}

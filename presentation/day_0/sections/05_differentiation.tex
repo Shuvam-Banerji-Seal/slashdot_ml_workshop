@@ -1,0 +1,479 @@
+% =============================================================================
+% Section 5: Differentiation
+% Rates of change and the heart of calculus
+% =============================================================================
+
+\section{Differentiation}
+
+% -----------------------------------------------------------------------------
+% Opening
+% -----------------------------------------------------------------------------
+\begin{frame}{Differentiation: The Art of Measuring Change}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{funnybox}
+                \textit{``How fast is your position changing? Ask the derivative! How fast is your speed changing? Ask the second derivative! How fast is your bank account changing? Don't ask.''}
+            \end{funnybox}
+            
+            \vspace{0.3cm}
+            
+            \textbf{The Big Question:}
+            
+            How fast is $f(x)$ changing at point $x$?
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.8]
+                \draw[<->,thick,softgray] (-0.5,0) -- (4,0) node[right] {$x$};
+                \draw[<->,thick,softgray] (0,-0.5) -- (0,3) node[above] {$y$};
+                
+                % Curve
+                \draw[accentcyan,thick,domain=0.3:3.5,smooth] plot (\x,{0.3*(\x-1)*(\x-1)+0.5});
+                
+                % Tangent line at x=2
+                \draw[neonpink,thick] (1,0.2) -- (3,1.4);
+                
+                % Point
+                \fill[neonyellow] (2,0.8) circle (3pt);
+                
+                % Labels
+                \node[accentcyan,right] at (3.2,2) {$f(x)$};
+                \node[neonpink,above] at (2.8,1.2) {tangent};
+                \node[neonyellow,below right] at (2,0.8) {slope = $f'(x)$};
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Secant to Tangent
+% -----------------------------------------------------------------------------
+\begin{frame}{From Secant to Tangent}
+    \centering
+    \begin{tikzpicture}[scale=0.85]
+        \draw[<->,thick,softgray] (-0.5,0) -- (5,0) node[right] {$x$};
+        \draw[<->,thick,softgray] (0,-0.5) -- (0,3.5) node[above] {$y$};
+        
+        % Curve
+        \draw[accentcyan,thick,domain=0.5:4.5,smooth,samples=50] plot (\x,{0.2*(\x-2)*(\x-2)+1});
+        
+        % Points
+        \coordinate (A) at (1.5,1.05);
+        \coordinate (B) at (3.5,1.45);
+        \coordinate (C) at (2.5,1.05);
+        
+        % Secant lines (fading)
+        \draw[softgray,thick] (0.8,0.55) -- (4.2,1.85);
+        \draw[neonyellow,thick] (1,0.75) -- (3.8,1.55);
+        \draw[neonpink,thick] (1.5,0.95) -- (3.2,1.25);
+        
+        % Tangent (final)
+        \draw[neongreen,very thick] (1.5,0.85) -- (3.5,1.25);
+        
+        % Point on curve
+        \fill[neongreen] (2.5,1.05) circle (3pt);
+        
+        % Labels
+        \node[below,fgwhite] at (1.5,0) {$a$};
+        \node[below,fgwhite] at (2.5,0) {$x$};
+        \node[below,fgwhite] at (3.5,0) {$a+h$};
+        
+        % Arrow showing h shrinking
+        \draw[<->,neonyellow] (2.5,-0.3) -- (3.5,-0.3) node[midway,below] {$h \to 0$};
+    \end{tikzpicture}
+    
+    \vspace{0.3cm}
+    
+    As $h \to 0$, the \textcolor{softgray}{secant line} becomes the \textcolor{neongreen}{tangent line}!
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Derivative Definition
+% -----------------------------------------------------------------------------
+\begin{frame}{The Derivative: Definition}
+    \begin{defbox}[Derivative]
+        The \glow{derivative} of $f$ at $x$ is:
+        \[
+            f'(x) = \lim_{h \to 0} \frac{f(x+h) - f(x)}{h}
+        \]
+        
+        provided this limit exists.
+        
+        \vspace{0.2cm}
+        
+        \textbf{Alternative notations:}
+        \[
+            f'(x) = \frac{df}{dx} = \frac{d}{dx}f(x) = Df(x) = \dot{f}
+        \]
+    \end{defbox}
+    
+    \vspace{0.3cm}
+    
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \textbf{What it measures:}
+            \begin{itemize}
+                \item Instantaneous rate of change
+                \item Slope of tangent line
+                \item Sensitivity of output to input
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{funnybox}
+                The derivative is asking: ``If I nudge $x$ a tiny bit, how much does $f(x)$ change?''
+            \end{funnybox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Example Derivation
+% -----------------------------------------------------------------------------
+\begin{frame}{Example: Deriving $f(x) = x^2$}
+    \begin{align*}
+        f'(x) &= \lim_{h \to 0} \frac{f(x+h) - f(x)}{h} \\[0.3cm]
+        &= \lim_{h \to 0} \frac{(x+h)^2 - x^2}{h} \\[0.3cm]
+        &= \lim_{h \to 0} \frac{x^2 + 2xh + h^2 - x^2}{h} \\[0.3cm]
+        &= \lim_{h \to 0} \frac{2xh + h^2}{h} \\[0.3cm]
+        &= \lim_{h \to 0} (2x + h) \\[0.3cm]
+        &= \mathbf{2x}
+    \end{align*}
+    
+    \begin{keybox}
+        If $f(x) = x^2$, then $f'(x) = 2x$. At $x=3$: slope $= 6$!
+    \end{keybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Power Rule
+% -----------------------------------------------------------------------------
+\begin{frame}{Differentiation Rules: Power Rule}
+    \begin{thmbox}[Power Rule]
+        If $f(x) = x^n$, then:
+        \[
+            \mathbf{f'(x) = nx^{n-1}}
+        \]
+        
+        Works for any real $n$!
+    \end{thmbox}
+    
+    \vspace{0.3cm}
+    
+    \textbf{Examples:}
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \begin{align*}
+                \frac{d}{dx}(x^3) &= 3x^2 \\
+                \frac{d}{dx}(x^5) &= 5x^4 \\
+                \frac{d}{dx}(x^{100}) &= 100x^{99}
+            \end{align*}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{align*}
+                \frac{d}{dx}(x^{-1}) &= -x^{-2} = -\frac{1}{x^2} \\
+                \frac{d}{dx}(\sqrt{x}) &= \frac{d}{dx}(x^{1/2}) = \frac{1}{2}x^{-1/2} \\
+                \frac{d}{dx}(1) &= \frac{d}{dx}(x^0) = 0
+            \end{align*}
+        \end{column}
+    \end{columns}
+    
+    \begin{funnybox}
+        ``Bring down the power, reduce by one'' — calculus's most satisfying rule!
+    \end{funnybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Basic Rules
+% -----------------------------------------------------------------------------
+\begin{frame}{More Differentiation Rules}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{defbox}[Constant Rule]
+                \[
+                    \frac{d}{dx}(c) = 0
+                \]
+                Constants don't change!
+            \end{defbox}
+            
+            \vspace{0.2cm}
+            
+            \begin{defbox}[Constant Multiple]
+                \[
+                    \frac{d}{dx}(cf) = c \cdot f'
+                \]
+            \end{defbox}
+            
+            \vspace{0.2cm}
+            
+            \begin{defbox}[Sum Rule]
+                \[
+                    \frac{d}{dx}(f + g) = f' + g'
+                \]
+            \end{defbox}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{defbox}[Product Rule]
+                \[
+                    \frac{d}{dx}(fg) = f'g + fg'
+                \]
+                ``First times derivative of second, plus second times derivative of first''
+            \end{defbox}
+            
+            \vspace{0.2cm}
+            
+            \begin{defbox}[Quotient Rule]
+                \[
+                    \frac{d}{dx}\left(\frac{f}{g}\right) = \frac{f'g - fg'}{g^2}
+                \]
+                ``Low d-high minus high d-low, over low squared''
+            \end{defbox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Chain Rule
+% -----------------------------------------------------------------------------
+\begin{frame}{The Chain Rule: Derivatives of Compositions}
+    \begin{thmbox}[Chain Rule]
+        If $y = f(g(x))$, then:
+        \[
+            \mathbf{\frac{dy}{dx} = f'(g(x)) \cdot g'(x)}
+        \]
+        
+        Or in Leibniz notation:
+        \[
+            \frac{dy}{dx} = \frac{dy}{du} \cdot \frac{du}{dx}
+        \]
+        where $u = g(x)$
+    \end{thmbox}
+    
+    \vspace{0.3cm}
+    
+    \textbf{Example:} Find $\frac{d}{dx}(x^2 + 1)^3$
+    
+    Let $u = x^2 + 1$, so $y = u^3$
+    \begin{align*}
+        \frac{dy}{du} &= 3u^2, \quad \frac{du}{dx} = 2x \\
+        \frac{dy}{dx} &= 3u^2 \cdot 2x = 3(x^2+1)^2 \cdot 2x = \mathbf{6x(x^2+1)^2}
+    \end{align*}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Chain Rule Visualization
+% -----------------------------------------------------------------------------
+\begin{frame}{Chain Rule: The Pipeline}
+    \centering
+    \begin{tikzpicture}[scale=0.9]
+        % Boxes
+        \node[rectangle,draw=neongreen,fill=darkgray,minimum width=1.5cm,minimum height=1cm] (x) at (0,0) {$x$};
+        \node[rectangle,draw=accentcyan,fill=darkgray,minimum width=1.5cm,minimum height=1cm] (g) at (3,0) {$g$};
+        \node[rectangle,draw=neonpink,fill=darkgray,minimum width=1.5cm,minimum height=1cm] (f) at (6,0) {$f$};
+        \node[rectangle,draw=neonyellow,fill=darkgray,minimum width=1.5cm,minimum height=1cm] (y) at (9,0) {$y$};
+        
+        % Forward arrows
+        \draw[->,thick,fgwhite] (x) -- (g) node[midway,above] {$x$};
+        \draw[->,thick,fgwhite] (g) -- (f) node[midway,above] {$u=g(x)$};
+        \draw[->,thick,fgwhite] (f) -- (y) node[midway,above] {$f(u)$};
+        
+        % Backward arrows (derivatives)
+        \draw[<-,thick,neonpink,dashed] (x.south) -- ++(0,-0.5) -- (g.south |- 0,-0.5) -- (g.south) node[midway,below] {$g'(x)$};
+        \draw[<-,thick,accentcyan,dashed] (g.south) -- ++(0,-1) -- (f.south |- 0,-1) -- (f.south) node[midway,below] {$f'(u)$};
+        
+        % Result
+        \node[below=2cm,fgwhite] at (4.5,0) {$\displaystyle\frac{dy}{dx} = \underbrace{f'(g(x))}_{\text{outer derivative}} \cdot \underbrace{g'(x)}_{\text{inner derivative}}$};
+    \end{tikzpicture}
+    
+    \vspace{0.5cm}
+    
+    \begin{funnybox}
+        Chain rule: Multiply all the ``rates of change'' along the pipeline!
+    \end{funnybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Important Derivatives
+% -----------------------------------------------------------------------------
+\begin{frame}{Important Derivatives to Know}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{defbox}[Exponential \& Log]
+                \begin{align*}
+                    \frac{d}{dx}(e^x) &= e^x \\
+                    \frac{d}{dx}(a^x) &= a^x \ln(a) \\
+                    \frac{d}{dx}(\ln x) &= \frac{1}{x} \\
+                    \frac{d}{dx}(\log_a x) &= \frac{1}{x \ln a}
+                \end{align*}
+            \end{defbox}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{defbox}[Trigonometric]
+                \begin{align*}
+                    \frac{d}{dx}(\sin x) &= \cos x \\
+                    \frac{d}{dx}(\cos x) &= -\sin x \\
+                    \frac{d}{dx}(\tan x) &= \sec^2 x
+                \end{align*}
+            \end{defbox}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.3cm}
+    
+    \begin{keybox}[Star of the Show]
+        $\frac{d}{dx}(e^x) = e^x$ — the exponential is its own derivative!
+        
+        This is why $e$ appears everywhere in calculus and ML!
+    \end{keybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Higher Derivatives
+% -----------------------------------------------------------------------------
+\begin{frame}{Higher-Order Derivatives}
+    \begin{defbox}[Higher Derivatives]
+        The \textbf{second derivative} is the derivative of the derivative:
+        \[
+            f''(x) = \frac{d^2f}{dx^2} = \frac{d}{dx}\left(\frac{df}{dx}\right)
+        \]
+        
+        And we can keep going: $f'''(x)$, $f^{(4)}(x)$, etc.
+    \end{defbox}
+    
+    \vspace{0.3cm}
+    
+    \textbf{Physical Interpretation:}
+    \begin{itemize}
+        \item $f(t)$ = position at time $t$
+        \item $f'(t)$ = velocity (rate of change of position)
+        \item $f''(t)$ = acceleration (rate of change of velocity)
+        \item $f'''(t)$ = jerk (rate of change of acceleration)
+    \end{itemize}
+    
+    \begin{funnybox}
+        Jerk is what makes roller coasters fun... or terrifying!
+    \end{funnybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Partial Derivatives
+% -----------------------------------------------------------------------------
+\begin{frame}{Partial Derivatives: Multiple Variables}
+    \begin{defbox}[Partial Derivative]
+        For $f(x, y)$, the \glow{partial derivative} with respect to $x$:
+        \[
+            \frac{\partial f}{\partial x} = \lim_{h \to 0} \frac{f(x+h, y) - f(x, y)}{h}
+        \]
+        
+        Treat $y$ as constant, differentiate with respect to $x$ only.
+    \end{defbox}
+    
+    \vspace{0.3cm}
+    
+    \textbf{Example:} $f(x, y) = x^2y + 3xy^2$
+    \begin{align*}
+        \frac{\partial f}{\partial x} &= 2xy + 3y^2 \quad \text{(treat $y$ as constant)} \\
+        \frac{\partial f}{\partial y} &= x^2 + 6xy \quad \text{(treat $x$ as constant)}
+    \end{align*}
+    
+    \begin{keybox}[ML Connection]
+        Neural networks have \textbf{many} parameters. Partial derivatives tell us how to adjust each one!
+    \end{keybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Gradient
+% -----------------------------------------------------------------------------
+\begin{frame}{The Gradient: All Partials Together}
+    \begin{defbox}[Gradient]
+        The \glow{gradient} of $f(x_1, x_2, ..., x_n)$ is a vector of all partial derivatives:
+        \[
+            \nabla f = \left( \frac{\partial f}{\partial x_1}, \frac{\partial f}{\partial x_2}, \ldots, \frac{\partial f}{\partial x_n} \right)
+        \]
+    \end{defbox}
+    
+    \vspace{0.3cm}
+    
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \textbf{Properties:}
+            \begin{itemize}
+                \item Points in direction of steepest increase
+                \item Magnitude = rate of steepest increase
+                \item Perpendicular to level curves
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.7]
+                % Contours
+                \foreach \r in {0.5,1,1.5,2} {
+                    \draw[accentcyan,thick] (0,0) circle (\r);
+                }
+                
+                % Gradient arrows
+                \foreach \angle in {0,45,90,135,180,225,270,315} {
+                    \draw[->,neonpink,thick] (\angle:1) -- (\angle:1.5);
+                }
+                
+                % Center
+                \fill[neonyellow] (0,0) circle (3pt);
+                \node[neonyellow,above right,font=\small] at (0,0) {min};
+                
+                \node[below,fgwhite,font=\small] at (0,-2.5) {$\nabla f$ points ``uphill''};
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Why Derivatives Matter in ML
+% -----------------------------------------------------------------------------
+\begin{frame}{Why Derivatives Matter in ML}
+    \begin{keybox}[The Core of Machine Learning]
+        \textbf{Training = Minimizing a Loss Function}
+        
+        \vspace{0.2cm}
+        
+        To find the minimum, we need \glow{derivatives}!
+    \end{keybox}
+    
+    \vspace{0.3cm}
+    
+    \textbf{Gradient Descent:}
+    \[
+        \theta_{\text{new}} = \theta_{\text{old}} - \eta \cdot \nabla_\theta L(\theta)
+    \]
+    
+    \begin{itemize}
+        \item $\theta$ = model parameters
+        \item $L$ = loss function
+        \item $\eta$ = learning rate
+        \item $\nabla_\theta L$ = gradient (tells us which way is ``downhill'')
+    \end{itemize}
+    
+    \begin{funnybox}
+        Gradient descent: ``Follow the slope downhill until you reach the bottom!''
+    \end{funnybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Key Takeaways
+% -----------------------------------------------------------------------------
+\begin{frame}{Key Takeaways: Differentiation}
+    \begin{keybox}
+        \begin{enumerate}
+            \item \textbf{Derivative} $f'(x) = \lim_{h \to 0} \frac{f(x+h) - f(x)}{h}$
+            \item \textbf{Geometric meaning}: Slope of tangent line
+            \item \textbf{Power rule}: $\frac{d}{dx}(x^n) = nx^{n-1}$
+            \item \textbf{Chain rule}: $(f \circ g)' = f'(g) \cdot g'$ — crucial for neural nets!
+            \item \textbf{Partial derivatives}: Rate of change in one variable
+            \item \textbf{Gradient} $\nabla f$: Vector of all partial derivatives
+            \item \textbf{ML connection}: Gradients guide learning (gradient descent)
+        \end{enumerate}
+    \end{keybox}
+    
+    \vspace{0.2cm}
+    
+    \centering
+    \textit{Next: Integration — the inverse of differentiation!}
+\end{frame}

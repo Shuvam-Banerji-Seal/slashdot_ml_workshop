@@ -1,0 +1,369 @@
+% =============================================================================
+% Section 12: Loss Functions
+% Measuring how wrong we are
+% =============================================================================
+
+\section{Loss Functions}
+
+% -----------------------------------------------------------------------------
+% Opening
+% -----------------------------------------------------------------------------
+\begin{frame}{Loss Functions: Measuring Mistakes}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{funnybox}
+                \textit{``The loss function is like a brutally honest friend. It tells you exactly how wrong you are — numerically.''}
+            \end{funnybox}
+            
+            \vspace{0.3cm}
+            
+            \textbf{The Goal:}
+            \begin{itemize}
+                \item Prediction: $\hat{y}$
+                \item True value: $y$
+                \item Loss: How far off is $\hat{y}$ from $y$?
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.8]
+                % Predicted vs actual
+                \draw[->] (0,0) -- (4,0) node[right] {$x$};
+                \draw[->] (0,0) -- (0,3) node[above] {$y$};
+                
+                % Target
+                \fill[neongreen] (2,2) circle (4pt);
+                \node[neongreen,right,font=\small] at (2.2,2) {$y$ (true)};
+                
+                % Prediction
+                \fill[neonpink] (2,0.8) circle (4pt);
+                \node[neonpink,right,font=\small] at (2.2,0.8) {$\hat{y}$ (pred)};
+                
+                % Error
+                \draw[<->,thick,neonyellow] (1.8,0.8) -- (1.8,2);
+                \node[neonyellow,left,font=\small] at (1.7,1.4) {error};
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Loss vs Cost
+% -----------------------------------------------------------------------------
+\begin{frame}{Loss vs Cost}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{defbox}[Loss Function]
+                \glow{Loss} $\mathcal{L}(\hat{y}, y)$ measures error for a \textbf{single sample}.
+                
+                \textit{How wrong is this one prediction?}
+            \end{defbox}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{defbox}[Cost Function]
+                \glow{Cost} $J$ is the \textbf{average loss} over all training samples:
+                
+                \[
+                    J = \frac{1}{N} \sum_{i=1}^{N} \mathcal{L}(\hat{y}^{(i)}, y^{(i)})
+                \]
+            \end{defbox}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.5cm}
+    
+    \begin{keybox}
+        \textbf{Training goal}: Minimize the cost function $J$
+        
+        Lower cost = better predictions (on average)
+    \end{keybox}
+    
+    \begin{funnybox}
+        Loss is personal. Cost is the team average.
+    \end{funnybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% MSE
+% -----------------------------------------------------------------------------
+\begin{frame}{Mean Squared Error (MSE)}
+    \begin{defbox}[MSE for Regression]
+        \[
+            \mathcal{L}_{\text{MSE}}(\hat{y}, y) = (\hat{y} - y)^2
+        \]
+        
+        \[
+            J_{\text{MSE}} = \frac{1}{N} \sum_{i=1}^{N} (\hat{y}^{(i)} - y^{(i)})^2
+        \]
+    \end{defbox}
+    
+    \vspace{0.3cm}
+    
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \textbf{Properties:}
+            \begin{itemize}
+                \item Always $\geq 0$
+                \item Zero when $\hat{y} = y$
+                \item Penalizes large errors MORE (squared!)
+                \item Smooth, differentiable
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.6]
+                \draw[->] (-2,0) -- (2,0) node[right] {$\hat{y} - y$};
+                \draw[->] (0,-0.3) -- (0,3) node[above] {Loss};
+                
+                \draw[thick,neonpink,domain=-1.5:1.5,samples=50] plot (\x, {\x*\x});
+                
+                \fill[neongreen] (0,0) circle (3pt);
+                \node[below,neongreen,font=\small] at (0,-0.3) {optimal};
+            \end{tikzpicture}
+            
+            \textit{Parabola centered at 0}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% MAE
+% -----------------------------------------------------------------------------
+\begin{frame}{Mean Absolute Error (MAE)}
+    \begin{defbox}[MAE for Regression]
+        \[
+            \mathcal{L}_{\text{MAE}}(\hat{y}, y) = |\hat{y} - y|
+        \]
+        
+        \[
+            J_{\text{MAE}} = \frac{1}{N} \sum_{i=1}^{N} |\hat{y}^{(i)} - y^{(i)}|
+        \]
+    \end{defbox}
+    
+    \vspace{0.3cm}
+    
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \textbf{MSE vs MAE:}
+            
+            \begin{tabular}{lcc}
+                & MSE & MAE \\
+                \hline
+                Outliers & Sensitive & Robust \\
+                Gradient & Smooth & Discontinuous at 0 \\
+                Use & Default & Noisy data
+            \end{tabular}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.6]
+                \draw[->] (-2,0) -- (2,0) node[right] {$\hat{y} - y$};
+                \draw[->] (0,-0.3) -- (0,2.5) node[above] {Loss};
+                
+                % MAE
+                \draw[thick,neongreen] (-1.5,1.5) -- (0,0) -- (1.5,1.5);
+                
+                \fill[neonyellow] (0,0) circle (3pt);
+            \end{tikzpicture}
+            
+            \textit{V-shaped (not smooth at 0)}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Binary Cross-Entropy
+% -----------------------------------------------------------------------------
+\begin{frame}{Binary Cross-Entropy (BCE)}
+    \begin{defbox}[BCE for Binary Classification]
+        For $y \in \{0, 1\}$ and $\hat{y} \in (0, 1)$ (probability):
+        \[
+            \mathcal{L}_{\text{BCE}}(\hat{y}, y) = -\left[y \log(\hat{y}) + (1-y) \log(1-\hat{y})\right]
+        \]
+    \end{defbox}
+    
+    \vspace{0.2cm}
+    
+    \textbf{Intuition:}
+    \begin{itemize}
+        \item If $y = 1$: Loss $= -\log(\hat{y})$ → want $\hat{y} \to 1$
+        \item If $y = 0$: Loss $= -\log(1-\hat{y})$ → want $\hat{y} \to 0$
+    \end{itemize}
+    
+    \centering
+    \begin{tikzpicture}[scale=0.6]
+        \draw[->] (0,0) -- (4,0) node[right] {$\hat{y}$};
+        \draw[->] (0,0) -- (0,3.5) node[above] {Loss};
+        
+        % -log(y) for y=1
+        \draw[thick,neonpink,domain=0.1:3.5,samples=50] plot (\x, {-ln(\x/3.5)});
+        \node[neonpink,font=\small] at (2.5,2.5) {$y=1$};
+        
+        % -log(1-y) for y=0
+        \draw[thick,neongreen,domain=0.1:3.4,samples=50] plot (\x, {-ln(1-\x/3.5)});
+        \node[neongreen,font=\small] at (1,2.5) {$y=0$};
+        
+        \node[below,font=\small] at (0,0) {0};
+        \node[below,font=\small] at (3.5,0) {1};
+    \end{tikzpicture}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Why Cross-Entropy?
+% -----------------------------------------------------------------------------
+\begin{frame}{Why Cross-Entropy for Classification?}
+    \begin{alertbox}[The Problem with MSE for Classification]
+        Using MSE with sigmoid output:
+        \begin{itemize}
+            \item Gradient $\to 0$ when sigmoid saturates
+            \item Very slow learning when $\hat{y} \approx 0$ or $\hat{y} \approx 1$
+            \item ``Vanishing gradient'' problem
+        \end{itemize}
+    \end{alertbox}
+    
+    \vspace{0.3cm}
+    
+    \begin{successbox}[Cross-Entropy Solves This]
+        The $\log$ in BCE cancels the $\exp$ in sigmoid!
+        
+        \[
+            \frac{\partial \mathcal{L}_{\text{BCE}}}{\partial z} = \hat{y} - y
+        \]
+        
+        Gradient is \textbf{linear} in error — no vanishing!
+    \end{successbox}
+    
+    \begin{keybox}
+        \textbf{Rule of thumb}: Use cross-entropy for classification, MSE for regression.
+    \end{keybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Categorical Cross-Entropy
+% -----------------------------------------------------------------------------
+\begin{frame}{Categorical Cross-Entropy (Multi-class)}
+    \begin{defbox}[Categorical Cross-Entropy]
+        For $K$ classes with one-hot encoded $\mathbf{y}$ and softmax output $\hat{\mathbf{y}}$:
+        \[
+            \mathcal{L}_{\text{CE}}(\hat{\mathbf{y}}, \mathbf{y}) = -\sum_{k=1}^{K} y_k \log(\hat{y}_k)
+        \]
+        
+        Since $\mathbf{y}$ is one-hot (only one $y_k = 1$):
+        \[
+            \mathcal{L}_{\text{CE}} = -\log(\hat{y}_c) \quad \text{where } c \text{ is the true class}
+        \]
+    \end{defbox}
+    
+    \vspace{0.2cm}
+    
+    \textbf{Example:} True class = 2 (out of 3)
+    \begin{align*}
+        \mathbf{y} &= (0, 1, 0) \\
+        \hat{\mathbf{y}} &= (0.1, 0.7, 0.2) \\
+        \mathcal{L} &= -\log(0.7) \approx 0.357
+    \end{align*}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Summary Table
+% -----------------------------------------------------------------------------
+\begin{frame}{Loss Function Summary}
+    \begin{tabular}{llll}
+        \textbf{Task} & \textbf{Loss} & \textbf{Output Act.} & \textbf{Formula} \\
+        \hline
+        Regression & MSE & None/Linear & $(\hat{y} - y)^2$ \\[0.3em]
+        Regression & MAE & None/Linear & $|\hat{y} - y|$ \\[0.3em]
+        Binary Class. & BCE & Sigmoid & $-y\log\hat{y} - (1-y)\log(1-\hat{y})$ \\[0.3em]
+        Multi-class & CE & Softmax & $-\sum_k y_k \log \hat{y}_k$ \\
+    \end{tabular}
+    
+    \vspace{0.5cm}
+    
+    \begin{funnybox}
+        Choosing the right loss function is like choosing the right tool:
+        
+        \begin{itemize}
+            \item Hammer (MSE) for nails (regression)
+            \item Screwdriver (CE) for screws (classification)
+        \end{itemize}
+    \end{funnybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Loss Landscape
+% -----------------------------------------------------------------------------
+\begin{frame}{The Loss Landscape}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{infobox}[Visualization]
+                The cost function $J(\mathbf{W})$ defines a ``landscape'' over parameter space.
+                
+                \begin{itemize}
+                    \item Valleys = good parameters
+                    \item Peaks = bad parameters
+                    \item Training = finding valleys
+                \end{itemize}
+            \end{infobox}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.6]
+                % 2D loss landscape
+                \draw[->] (-2,0) -- (3,0) node[right] {$w_1$};
+                \draw[->] (0,-0.5) -- (0,3) node[above] {$J$};
+                
+                % Wavy landscape
+                \draw[thick,accentcyan,domain=-1.5:2.5,samples=50] 
+                    plot (\x, {1.5 + 0.5*sin(3*\x r) + 0.3*\x*\x - 0.3*\x});
+                
+                % Local min
+                \fill[neonyellow] (-0.5,1.1) circle (2pt);
+                \node[neonyellow,below,font=\tiny] at (-0.5,1.0) {local};
+                
+                % Global min
+                \fill[neongreen] (1.5,1.2) circle (2pt);
+                \node[neongreen,below,font=\tiny] at (1.5,1.1) {global};
+            \end{tikzpicture}
+            
+            \textit{Non-convex landscape}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.3cm}
+    
+    \begin{keybox}
+        Neural network loss landscapes are:
+        \begin{itemize}
+            \item High-dimensional (millions of parameters!)
+            \item Non-convex (multiple minima)
+            \item Surprisingly well-behaved (saddle points, not local minima)
+        \end{itemize}
+    \end{keybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Key Takeaways
+% -----------------------------------------------------------------------------
+\begin{frame}{Key Takeaways: Loss Functions}
+    \begin{keybox}
+        \begin{enumerate}
+            \item \textbf{Loss} = error for one sample, \textbf{Cost} = average over dataset
+            \item \textbf{MSE}: $(\hat{y}-y)^2$ — regression, penalizes outliers
+            \item \textbf{MAE}: $|\hat{y}-y|$ — regression, robust to outliers
+            \item \textbf{Binary Cross-Entropy}: $-y\log\hat{y} - (1-y)\log(1-\hat{y})$
+            \begin{itemize}
+                \item Use with sigmoid output for binary classification
+            \end{itemize}
+            \item \textbf{Categorical Cross-Entropy}: $-\sum y_k \log \hat{y}_k$
+            \begin{itemize}
+                \item Use with softmax output for multi-class
+            \end{itemize}
+            \item Match loss function to task and output activation!
+        \end{enumerate}
+    \end{keybox}
+    
+    \vspace{0.2cm}
+    
+    \centering
+    \textit{Next: How do we minimize the loss? Backpropagation!}
+\end{frame}

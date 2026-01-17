@@ -1,0 +1,363 @@
+% =============================================================================
+% Section 18: Statistical Learning Theory
+% PAC Learning, VC Dimension, Generalization
+% =============================================================================
+
+\section{Statistical Learning Theory}
+
+% -----------------------------------------------------------------------------
+% Opening
+% -----------------------------------------------------------------------------
+\begin{frame}{Statistical Learning Theory: Why ML Works}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{funnybox}
+                \textit{``We've been fitting models and hoping they work. Let's understand WHY they work (or don't)!''}
+            \end{funnybox}
+            
+            \vspace{0.3cm}
+            
+            \textbf{The Big Questions:}
+            \begin{itemize}
+                \item When can we learn from data?
+                \item How much data do we need?
+                \item Why does training error $\neq$ test error?
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.7]
+                \draw[->] (0,0) -- (4,0) node[right] {samples};
+                \draw[->] (0,0) -- (0,3) node[above] {error};
+                
+                % Generalization gap
+                \draw[thick,neonpink,domain=0.3:3.8,samples=50] 
+                    plot (\x, {0.3 + 1.5/\x});
+                \node[neonpink,font=\tiny] at (3.5,1.3) {test};
+                
+                \draw[thick,neongreen,domain=0.3:3.8,samples=50] 
+                    plot (\x, {0.2 + 0.8/\x});
+                \node[neongreen,font=\tiny] at (3.5,0.7) {train};
+                
+                % Gap
+                \draw[<->,thick,neonyellow] (2,0.6) -- (2,1.05);
+                \node[neonyellow,right,font=\tiny] at (2.1,0.8) {gap};
+            \end{tikzpicture}
+            
+            \textit{Generalization gap decreases with more data}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% PAC Learning
+% -----------------------------------------------------------------------------
+\begin{frame}{PAC Learning: Probably Approximately Correct}
+    \begin{defbox}[PAC Learning (Valiant, 1984)]
+        A concept class $\mathcal{C}$ is \glow{PAC-learnable} if there exists an algorithm that:
+        
+        For any distribution $\mathcal{D}$, any $\epsilon > 0$, any $\delta > 0$:
+        
+        Given $m$ samples from $\mathcal{D}$, the algorithm outputs $h$ such that:
+        \[
+            P\left[\text{error}(h) \leq \epsilon\right] \geq 1 - \delta
+        \]
+        
+        with $m = \text{poly}(1/\epsilon, 1/\delta, n, \text{size}(c))$
+    \end{defbox}
+    
+    \vspace{0.2cm}
+    
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \begin{keybox}[Translation]
+                \textbf{Probably}: With high probability ($1-\delta$)
+                
+                \textbf{Approximately}: Low error ($\leq \epsilon$)
+                
+                \textbf{Correct}: On new data!
+            \end{keybox}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{funnybox}
+                ``Give me enough data, and I'll \textit{probably} give you something \textit{approximately} right!''
+            \end{funnybox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Generalization Error
+% -----------------------------------------------------------------------------
+\begin{frame}{Generalization Error Decomposition}
+    \begin{defbox}[Error Types]
+        \begin{itemize}
+            \item \textbf{Training error}: Error on training data
+            \[
+                \hat{R}(h) = \frac{1}{n}\sum_{i=1}^{n} \mathbf{1}[h(x_i) \neq y_i]
+            \]
+            
+            \item \textbf{Generalization error}: Expected error on new data
+            \[
+                R(h) = \mathbb{E}_{(x,y) \sim \mathcal{D}}[\mathbf{1}[h(x) \neq y]]
+            \]
+        \end{itemize}
+    \end{defbox}
+    
+    \vspace{0.3cm}
+    
+    \begin{keybox}[The Gap]
+        \[
+            \underbrace{R(h)}_{\text{test error}} = \underbrace{\hat{R}(h)}_{\text{train error}} + \underbrace{(R(h) - \hat{R}(h))}_{\text{generalization gap}}
+        \]
+    \end{keybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Finite Hypothesis Classes
+% -----------------------------------------------------------------------------
+\begin{frame}{Generalization Bound (Finite Hypothesis Class)}
+    \begin{thmbox}[Finite Hypothesis Bound]
+        For a finite hypothesis class $|\mathcal{H}|$, with probability $\geq 1-\delta$:
+        \[
+            R(h) \leq \hat{R}(h) + \sqrt{\frac{\ln|\mathcal{H}| + \ln(1/\delta)}{2n}}
+        \]
+    \end{thmbox}
+    
+    \vspace{0.2cm}
+    
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \textbf{Implications:}
+            \begin{itemize}
+                \item More hypotheses → larger gap
+                \item More data $n$ → smaller gap
+                \item Higher confidence $1/\delta$ → larger gap
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{alertbox}[Problem]
+                Neural networks have infinite hypothesis classes!
+                
+                This bound doesn't directly apply...
+            \end{alertbox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% VC Dimension
+% -----------------------------------------------------------------------------
+\begin{frame}{VC Dimension: Measuring Model Complexity}
+    \begin{defbox}[Shattering]
+        A hypothesis class $\mathcal{H}$ \glow{shatters} a set of points if it can realize ALL possible labelings of those points.
+    \end{defbox}
+    
+    \begin{defbox}[VC Dimension]
+        The \glow{VC dimension} of $\mathcal{H}$ is the maximum number of points that can be shattered by $\mathcal{H}$.
+    \end{defbox}
+    
+    \centering
+    \begin{tikzpicture}[scale=0.6]
+        % 3 points that can be shattered by linear classifiers
+        \node[font=\small,accentcyan] at (2,3) {Linear classifiers in 2D: VC = 3};
+        
+        \foreach \config/\xshift in {1/0, 2/4, 3/8} {
+            \begin{scope}[xshift=\xshift cm]
+                \fill[neongreen] (0.5,0.5) circle (4pt);
+                \fill[neongreen] (1.5,0.5) circle (4pt);
+                \fill[neonpink] (1,1.5) circle (4pt);
+                \draw[thick,neonyellow] (0,1) -- (2,1);
+            \end{scope}
+        }
+        
+        \node[below,font=\tiny,fgwhite] at (5,-0.3) {Can separate any 3 points...};
+    \end{tikzpicture}
+    
+    \begin{tikzpicture}[scale=0.6]
+        % 4 points cannot be shattered (XOR)
+        \fill[neongreen] (0.5,0.5) circle (4pt);
+        \fill[neongreen] (1.5,1.5) circle (4pt);
+        \fill[neonpink] (0.5,1.5) circle (4pt);
+        \fill[neonpink] (1.5,0.5) circle (4pt);
+        
+        \node[right,font=\tiny,fgwhite] at (2,1) {Can't separate XOR with a line!};
+    \end{tikzpicture}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% VC Bound
+% -----------------------------------------------------------------------------
+\begin{frame}{VC Generalization Bound}
+    \begin{thmbox}[VC Bound]
+        For hypothesis class with VC dimension $d$, with probability $\geq 1-\delta$:
+        \[
+            R(h) \leq \hat{R}(h) + \sqrt{\frac{d(\ln(2n/d) + 1) + \ln(4/\delta)}{n}}
+        \]
+    \end{thmbox}
+    
+    \vspace{0.3cm}
+    
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \begin{keybox}[Implications]
+                \begin{itemize}
+                    \item Higher VC dim → worse generalization
+                    \item Need $n \gg d$ for good bounds
+                    \item Model complexity matters!
+                \end{itemize}
+            \end{keybox}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{infobox}[VC Examples]
+                \begin{itemize}
+                    \item Linear in $\mathbb{R}^d$: VC = $d+1$
+                    \item Intervals on $\mathbb{R}$: VC = 2
+                    \item Axis-aligned rectangles: VC = 4
+                    \item Neural nets: Depends on depth/width
+                \end{itemize}
+            \end{infobox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Bias-Variance
+% -----------------------------------------------------------------------------
+\begin{frame}{Bias-Variance Tradeoff (Formal)}
+    \begin{defbox}[MSE Decomposition]
+        For any estimator $\hat{f}$:
+        \[
+            \mathbb{E}[(y - \hat{f}(x))^2] = \underbrace{\text{Bias}[\hat{f}(x)]^2}_{\text{systematic error}} + \underbrace{\text{Var}[\hat{f}(x)]}_{\text{sensitivity to training}} + \underbrace{\sigma^2}_{\text{irreducible}}
+        \]
+    \end{defbox}
+    
+    \centering
+    \begin{tikzpicture}[scale=0.5]
+        \draw[->] (0,0) -- (5,0) node[right] {complexity};
+        \draw[->] (0,0) -- (0,3.5) node[above] {error};
+        
+        % Bias
+        \draw[thick,neongreen,domain=0.3:4.7,samples=50] 
+            plot (\x, {2.5/\x});
+        \node[neongreen,font=\small] at (4.5,1) {Bias$^2$};
+        
+        % Variance
+        \draw[thick,neonpink,domain=0.3:4.7,samples=50] 
+            plot (\x, {0.1*\x*\x});
+        \node[neonpink,font=\small] at (4.5,2.5) {Variance};
+        
+        % Total
+        \draw[thick,neonyellow,domain=0.3:4.7,samples=50] 
+            plot (\x, {2.5/\x + 0.1*\x*\x});
+        \node[neonyellow,font=\small] at (2.5,3.2) {Total};
+        
+        % Optimal
+        \draw[dashed,accentcyan] (2,0) -- (2,3);
+        \node[accentcyan,above,font=\tiny] at (2,3) {optimal};
+    \end{tikzpicture}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% No Free Lunch
+% -----------------------------------------------------------------------------
+\begin{frame}{No Free Lunch Theorem}
+    \begin{thmbox}[No Free Lunch (Wolpert \& Macready)]
+        Averaged over ALL possible problems, every learning algorithm performs equally!
+        
+        \[
+            \sum_f P(d_m | f, A_1) = \sum_f P(d_m | f, A_2)
+        \]
+        
+        for any algorithms $A_1, A_2$ and any performance measure.
+    \end{thmbox}
+    
+    \vspace{0.3cm}
+    
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \begin{funnybox}
+                ``No algorithm is universally better. Some are just better for YOUR problem!''
+            \end{funnybox}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{keybox}[Implications]
+                \begin{itemize}
+                    \item Domain knowledge matters
+                    \item Try multiple algorithms
+                    \item Inductive bias is crucial
+                \end{itemize}
+            \end{keybox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Sample Complexity
+% -----------------------------------------------------------------------------
+\begin{frame}{Sample Complexity: How Much Data?}
+    \begin{defbox}[Sample Complexity]
+        Minimum samples $m$ needed to achieve error $\leq \epsilon$ with probability $\geq 1-\delta$.
+    \end{defbox}
+    
+    \vspace{0.2cm}
+    
+    \textbf{For PAC-learnable classes:}
+    \[
+        m \geq \frac{1}{\epsilon}\left(d \ln\frac{1}{\epsilon} + \ln\frac{1}{\delta}\right)
+    \]
+    
+    where $d$ is VC dimension.
+    
+    \vspace{0.3cm}
+    
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \begin{infobox}[Rule of Thumb]
+                For neural nets, people often use:
+                \[
+                    n \geq 10 \times \text{(\# parameters)}
+                \]
+                
+                (Very rough heuristic!)
+            \end{infobox}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{alertbox}[Modern Paradox]
+                Deep learning often works with:
+                \[
+                    n \ll \text{(\# parameters)}
+                \]
+                
+                Theory is still catching up!
+            \end{alertbox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Key Takeaways
+% -----------------------------------------------------------------------------
+\begin{frame}{Key Takeaways: Statistical Learning Theory}
+    \begin{keybox}
+        \begin{enumerate}
+            \item \textbf{PAC learning}: Probably Approximately Correct framework
+            \item \textbf{Generalization gap}: Test error - Train error
+            \item \textbf{VC dimension}: Measure of model complexity
+            \begin{itemize}
+                \item Max points a model can shatter
+            \end{itemize}
+            \item \textbf{Generalization bounds}: Test error bounded by train error + complexity term
+            \item \textbf{Bias-Variance tradeoff}: 
+            \begin{itemize}
+                \item Simple models: high bias, low variance
+                \item Complex models: low bias, high variance
+            \end{itemize}
+            \item \textbf{No Free Lunch}: No universal best algorithm
+            \item \textbf{Sample complexity}: More complex model → more data needed
+        \end{enumerate}
+    \end{keybox}
+    
+    \centering
+    \textit{Next: KL Divergence and Information Theory!}
+\end{frame}

@@ -1,0 +1,319 @@
+% =============================================================================
+% Section 20: MNIST Dataset
+% The "Hello World" of Machine Learning
+% =============================================================================
+
+\section{MNIST Dataset}
+
+% -----------------------------------------------------------------------------
+% Opening
+% -----------------------------------------------------------------------------
+\begin{frame}{MNIST: The ``Hello World'' of ML}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{funnybox}
+                \textit{``Every ML journey starts with MNIST. It's tradition. Like 'Hello World' for programmers, but with more pixels.''}
+            \end{funnybox}
+            
+            \vspace{0.3cm}
+            
+            \textbf{What is MNIST?}
+            \begin{itemize}
+                \item Handwritten digit images
+                \item Collected from Census Bureau
+                \item Created by Yann LeCun, 1998
+                \item The benchmark for decades
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.6]
+                % Grid of digits (simplified representation)
+                \foreach \i in {0,...,2} {
+                    \foreach \j in {0,...,2} {
+                        \draw[thick,accentcyan,rounded corners] (\i*1.5,\j*1.5) rectangle (\i*1.5+1.2,\j*1.5+1.2);
+                        \pgfmathtruncatemacro{\digit}{mod(\i+\j*3,10)}
+                        \node[font=\Large,fgwhite] at (\i*1.5+0.6,\j*1.5+0.6) {\digit};
+                    }
+                }
+                \node[below,fgwhite,font=\small] at (1.8,-0.3) {28×28 grayscale images};
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Dataset Details
+% -----------------------------------------------------------------------------
+\begin{frame}{MNIST Dataset Details}
+    \begin{defbox}[MNIST Specifications]
+        \begin{columns}
+            \begin{column}{0.5\textwidth}
+                \begin{itemize}
+                    \item \textbf{Training set}: 60,000 images
+                    \item \textbf{Test set}: 10,000 images
+                    \item \textbf{Image size}: 28 × 28 pixels
+                    \item \textbf{Channels}: 1 (grayscale)
+                    \item \textbf{Pixel values}: 0-255 (usually normalized)
+                \end{itemize}
+            \end{column}
+            \begin{column}{0.5\textwidth}
+                \begin{itemize}
+                    \item \textbf{Classes}: 10 (digits 0-9)
+                    \item \textbf{Input dimension}: 784 (28×28)
+                    \item \textbf{Output}: One-hot or class label
+                    \item \textbf{Format}: IDX file format
+                    \item \textbf{Size}: ~12 MB total
+                \end{itemize}
+            \end{column}
+        \end{columns}
+    \end{defbox}
+    
+    \vspace{0.3cm}
+    
+    \begin{keybox}
+        \textbf{As a vector:} Each image $\rightarrow$ 784-dimensional vector
+        
+        \textbf{Input shape:} $(N, 1, 28, 28)$ or $(N, 784)$ depending on model
+    \end{keybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Image as Vector
+% -----------------------------------------------------------------------------
+\begin{frame}{Image as Data: Flattening}
+    \centering
+    \begin{tikzpicture}[scale=0.8]
+        % 2D image
+        \node[font=\small,accentcyan] at (0,3) {28×28 Image};
+        \draw[thick,accentcyan] (-1.5,-1.5) rectangle (1.5,1.5);
+        
+        % Grid
+        \foreach \i in {-1.2,-0.6,0,0.6,1.2} {
+            \draw[accentcyan,opacity=0.3] (\i,-1.5) -- (\i,1.5);
+            \draw[accentcyan,opacity=0.3] (-1.5,\i) -- (1.5,\i);
+        }
+        
+        % Some pixels highlighted
+        \fill[neonpink,opacity=0.5] (-1.5,0.9) rectangle (-0.9,1.5);
+        \fill[neonpink,opacity=0.3] (-0.9,0.9) rectangle (-0.3,1.5);
+        
+        % Arrow
+        \draw[->,ultra thick,neonyellow] (2,0) -- (4,0) node[midway,above] {flatten};
+        
+        % Vector
+        \node[font=\small,neongreen] at (7,3) {784-d Vector};
+        \draw[thick,neongreen] (5,1.5) rectangle (5.5,-1.5);
+        
+        % Vector elements
+        \foreach \y in {1.2,0.9,0.6,0.3,0,-0.3,-0.6} {
+            \draw[neongreen,opacity=0.3] (5,\y) -- (5.5,\y);
+        }
+        \fill[neonpink,opacity=0.5] (5,1.2) rectangle (5.5,1.5);
+        \fill[neonpink,opacity=0.3] (5,0.9) rectangle (5.5,1.2);
+        
+        \node[font=\tiny,fgwhite] at (5.25,1.35) {$x_1$};
+        \node[font=\tiny,fgwhite] at (5.25,1.05) {$x_2$};
+        \node[font=\tiny,fgwhite] at (5.25,0) {...};
+        \node[font=\tiny,fgwhite] at (5.25,-1.2) {$x_{784}$};
+    \end{tikzpicture}
+    
+    \vspace{0.3cm}
+    
+    \begin{infobox}
+        Pixel $(i, j) \rightarrow$ vector index $28 \cdot i + j$
+        
+        Row-major ordering: read left-to-right, top-to-bottom
+    \end{infobox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Data Preprocessing
+% -----------------------------------------------------------------------------
+\begin{frame}{Preprocessing MNIST}
+    \begin{keybox}[Standard Preprocessing]
+        \begin{enumerate}
+            \item \textbf{Normalization}: Scale to $[0, 1]$ or standardize
+            \[
+                x' = \frac{x}{255} \quad \text{or} \quad x' = \frac{x - \mu}{\sigma}
+            \]
+            
+            \item \textbf{Reshaping}: 
+            \begin{itemize}
+                \item MLP: $(N, 784)$ — flat vector
+                \item CNN: $(N, 1, 28, 28)$ — keep spatial structure
+            \end{itemize}
+            
+            \item \textbf{Labels}: One-hot encode for cross-entropy
+            \[
+                y = 3 \rightarrow \mathbf{y} = (0,0,0,1,0,0,0,0,0,0)
+            \]
+        \end{enumerate}
+    \end{keybox}
+    
+    \begin{funnybox}
+        MNIST statistics: $\mu \approx 0.1307$, $\sigma \approx 0.3081$
+        
+        (These numbers are ML folk knowledge at this point!)
+    \end{funnybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Historical Performance
+% -----------------------------------------------------------------------------
+\begin{frame}{MNIST Performance Through History}
+    \centering
+    \begin{tikzpicture}[scale=0.9]
+        \draw[->] (0,0) -- (10,0) node[right] {year};
+        \draw[->] (0,0) -- (0,4) node[above] {error \%};
+        
+        % Timeline markers
+        \foreach \x/\year in {1/1998, 3/2003, 5/2010, 7/2015, 9/2020} {
+            \draw (\x,0.1) -- (\x,-0.1) node[below,font=\tiny] {\year};
+        }
+        
+        % Error rate line
+        \draw[thick,neonpink] (1,3.5) -- (2,2.8) -- (3,2.0) -- (4,1.5) -- (5,1.0) -- (6,0.6) -- (7,0.4) -- (8,0.3) -- (9,0.2);
+        
+        % Key points
+        \fill[neonyellow] (1,3.5) circle (3pt);
+        \node[above,font=\tiny,neonyellow] at (1,3.5) {SVM};
+        
+        \fill[neonyellow] (3,2.0) circle (3pt);
+        \node[above,font=\tiny,neonyellow] at (3,2.0) {LeNet};
+        
+        \fill[neonyellow] (6,0.6) circle (3pt);
+        \node[above,font=\tiny,neonyellow] at (6,0.6) {CNN+aug};
+        
+        \fill[neongreen] (9,0.2) circle (3pt);
+        \node[above,font=\tiny,neongreen] at (9,0.2) {0.17\%!};
+        
+        % Human performance
+        \draw[dashed,accentcyan] (0,1.2) -- (10,1.2);
+        \node[accentcyan,font=\tiny,right] at (10,1.2) {human};
+    \end{tikzpicture}
+    
+    \vspace{0.2cm}
+    
+    \begin{infobox}
+        \textbf{State-of-art}: 0.17\% error (99.83\% accuracy)
+        
+        \textbf{Human performance}: ~1-2\% error (some digits are genuinely ambiguous!)
+    \end{infobox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Why MNIST?
+% -----------------------------------------------------------------------------
+\begin{frame}{Why Start with MNIST?}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{successbox}[Advantages]
+                \begin{itemize}
+                    \item Small and fast to train
+                    \item Easy to visualize
+                    \item Well-studied baseline
+                    \item Works on CPU
+                    \item Great for learning
+                    \item Available everywhere
+                \end{itemize}
+            \end{successbox}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{alertbox}[Limitations]
+                \begin{itemize}
+                    \item ``Too easy'' for modern methods
+                    \item Not representative of real problems
+                    \item Grayscale, centered, clean
+                    \item Limited variability
+                    \item ``MNIST-easy'' is a term!
+                \end{itemize}
+            \end{alertbox}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.3cm}
+    
+    \begin{keybox}[Next Steps After MNIST]
+        \begin{itemize}
+            \item \textbf{Fashion-MNIST}: Clothes instead of digits (same format)
+            \item \textbf{CIFAR-10/100}: 32×32 color images, 10/100 classes
+            \item \textbf{ImageNet}: 1000 classes, real images
+        \end{itemize}
+    \end{keybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Loading in PyTorch
+% -----------------------------------------------------------------------------
+\begin{frame}{Loading MNIST in PyTorch}
+    \begin{successbox}[PyTorch Implementation]
+        {\small\ttfamily
+        import torch\\
+        from torchvision import datasets, transforms\\
+        from torch.utils.data import DataLoader\\[0.3em]
+        transform = transforms.Compose([\\
+        \quad transforms.ToTensor(),\\
+        \quad transforms.Normalize((0.1307,), (0.3081,))\\
+        ])\\[0.3em]
+        train\_data = datasets.MNIST(root='./data', train=True,\\
+        \quad\quad\quad\quad\quad download=True, transform=transform)\\
+        test\_data = datasets.MNIST(root='./data', train=False,\\
+        \quad\quad\quad\quad\quad download=True, transform=transform)\\[0.3em]
+        train\_loader = DataLoader(train\_data, batch\_size=64, shuffle=True)\\
+        test\_loader = DataLoader(test\_data, batch\_size=64, shuffle=False)
+        }
+    \end{successbox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Simple Model
+% -----------------------------------------------------------------------------
+\begin{frame}{A Simple MNIST Classifier}
+    \begin{successbox}[MLP for MNIST]
+        {\small\ttfamily
+        import torch.nn as nn\\[0.3em]
+        class MNISTClassifier(nn.Module):\\
+        \quad def \_\_init\_\_(self):\\
+        \quad\quad super().\_\_init\_\_()\\
+        \quad\quad self.flatten = nn.Flatten()\\
+        \quad\quad self.layers = nn.Sequential(\\
+        \quad\quad\quad nn.Linear(784, 256), nn.ReLU(), nn.Dropout(0.2),\\
+        \quad\quad\quad nn.Linear(256, 128), nn.ReLU(), nn.Dropout(0.2),\\
+        \quad\quad\quad nn.Linear(128, 10)\\
+        \quad\quad )\\[0.3em]
+        \quad def forward(self, x):\\
+        \quad\quad x = self.flatten(x)\\
+        \quad\quad return self.layers(x)\\[0.3em]
+        \# Typical accuracy: approx 98\% with this simple model!
+        }
+    \end{successbox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Key Takeaways
+% -----------------------------------------------------------------------------
+\begin{frame}{Key Takeaways: MNIST}
+    \begin{keybox}
+        \begin{enumerate}
+            \item \textbf{MNIST}: 70,000 handwritten digits (60k train, 10k test)
+            \item \textbf{Format}: 28×28 grayscale → 784-dim vector
+            \item \textbf{Preprocessing}:
+            \begin{itemize}
+                \item Normalize: divide by 255 or use $\mu=0.1307, \sigma=0.3081$
+                \item One-hot encode labels for cross-entropy
+            \end{itemize}
+            \item \textbf{Baseline performance}:
+            \begin{itemize}
+                \item Simple MLP: ~98\%
+                \item CNN: ~99\%
+                \item State-of-art: 99.8\%+
+            \end{itemize}
+            \item \textbf{Perfect for learning} but not representative of real challenges
+            \item \textbf{Graduate to}: Fashion-MNIST, CIFAR-10, ImageNet
+        \end{enumerate}
+    \end{keybox}
+    
+    \centering
+    \textit{Next: Putting it all together — Training Pipeline!}
+\end{frame}

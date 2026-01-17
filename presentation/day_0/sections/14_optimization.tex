@@ -1,0 +1,390 @@
+% =============================================================================
+% Section 14: Optimization Algorithms
+% From vanilla gradient descent to Adam
+% =============================================================================
+
+\section{Optimization Algorithms}
+
+% -----------------------------------------------------------------------------
+% Opening
+% -----------------------------------------------------------------------------
+\begin{frame}{Optimization: Finding the Best Weights}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{funnybox}
+                \textit{``Gradient descent is like hiking down a mountain in the fog. You can only feel the slope beneath your feet and hope you're going the right way.''}
+            \end{funnybox}
+            
+            \vspace{0.3cm}
+            
+            \textbf{The Challenge:}
+            \begin{itemize}
+                \item Loss landscape is high-dimensional
+                \item Non-convex (many local minima)
+                \item We only see local gradients
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.7]
+                \draw[->] (0,0) -- (4.5,0) node[right] {$w$};
+                \draw[->] (0,0) -- (0,3.5) node[above] {$J$};
+                
+                % Complex landscape
+                \draw[thick,accentcyan,domain=0.3:4,samples=100] 
+                    plot (\x, {1.5 + 0.5*sin(4*\x r) + 0.2*\x});
+                
+                % Current position
+                \fill[neonpink] (1,1.8) circle (3pt);
+                \draw[->,thick,neonyellow] (1,1.8) -- (1.5,1.4);
+                
+                % Local minimum
+                \fill[neonyellow] (2.3,1.3) circle (2pt);
+                
+                % Global minimum
+                \fill[neongreen] (3.5,1.1) circle (2pt);
+                \node[neongreen,below,font=\tiny] at (3.5,0.9) {global};
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Vanilla Gradient Descent
+% -----------------------------------------------------------------------------
+\begin{frame}{Vanilla Gradient Descent}
+    \begin{defbox}[Gradient Descent Update]
+        \[
+            \theta_{t+1} = \theta_t - \eta \nabla_\theta J(\theta_t)
+        \]
+        
+        where $\eta$ is the \glow{learning rate}.
+    \end{defbox}
+    
+    \vspace{0.3cm}
+    
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \textbf{Types by batch size:}
+            \begin{itemize}
+                \item \textbf{Batch GD}: All data at once
+                \item \textbf{Stochastic GD}: One sample
+                \item \textbf{Mini-batch GD}: Subset (common!)
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{alertbox}[Problems]
+                \begin{itemize}
+                    \item Learning rate too high → diverge
+                    \item Learning rate too low → slow
+                    \item Same rate for all parameters
+                    \item Gets stuck in saddle points
+                \end{itemize}
+            \end{alertbox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Learning Rate
+% -----------------------------------------------------------------------------
+\begin{frame}{The Learning Rate Dilemma}
+    \centering
+    \begin{tikzpicture}[scale=0.8]
+        % Too small
+        \begin{scope}[xshift=0cm]
+            \draw[->] (0,0) -- (3,0) node[right,font=\small] {$w$};
+            \draw[->] (0,0) -- (0,2.5) node[above,font=\small] {$J$};
+            \draw[thick,accentcyan,domain=0.3:2.7,samples=50] plot (\x, {0.3 + 1.5*(\x-1.5)*(\x-1.5)});
+            
+            \fill[neonpink] (0.5,2.0) circle (2pt);
+            \fill[neonpink] (0.6,1.7) circle (2pt);
+            \fill[neonpink] (0.7,1.5) circle (2pt);
+            \fill[neonpink] (0.8,1.3) circle (2pt);
+            
+            \node[below,font=\small] at (1.5,-0.3) {$\eta$ too small};
+            \node[below,font=\tiny,fgwhite] at (1.5,-0.7) {(very slow)};
+        \end{scope}
+        
+        % Just right
+        \begin{scope}[xshift=4.5cm]
+            \draw[->] (0,0) -- (3,0) node[right,font=\small] {$w$};
+            \draw[->] (0,0) -- (0,2.5) node[above,font=\small] {$J$};
+            \draw[thick,accentcyan,domain=0.3:2.7,samples=50] plot (\x, {0.3 + 1.5*(\x-1.5)*(\x-1.5)});
+            
+            \fill[neongreen] (0.5,2.0) circle (2pt);
+            \fill[neongreen] (1.0,0.9) circle (2pt);
+            \fill[neongreen] (1.4,0.35) circle (2pt);
+            \fill[neongreen] (1.5,0.3) circle (2pt);
+            
+            \node[below,font=\small] at (1.5,-0.3) {$\eta$ just right};
+            \node[below,font=\tiny,fgwhite] at (1.5,-0.7) {(converges)};
+        \end{scope}
+        
+        % Too large
+        \begin{scope}[xshift=9cm]
+            \draw[->] (0,0) -- (3,0) node[right,font=\small] {$w$};
+            \draw[->] (0,0) -- (0,2.5) node[above,font=\small] {$J$};
+            \draw[thick,accentcyan,domain=0.3:2.7,samples=50] plot (\x, {0.3 + 1.5*(\x-1.5)*(\x-1.5)});
+            
+            \fill[neonpink] (0.5,2.0) circle (2pt);
+            \fill[neonpink] (2.5,2.0) circle (2pt);
+            \fill[neonpink] (0.6,1.7) circle (2pt);
+            \draw[->,thick,neonyellow] (0.5,2.0) -- (2.4,2.0);
+            
+            \node[below,font=\small] at (1.5,-0.3) {$\eta$ too large};
+            \node[below,font=\tiny,fgwhite] at (1.5,-0.7) {(oscillates/diverges)};
+        \end{scope}
+    \end{tikzpicture}
+    
+    \vspace{0.3cm}
+    
+    \begin{keybox}
+        \textbf{Typical values}: $\eta \in [10^{-4}, 10^{-1}]$
+        
+        Start with $0.001$ and adjust based on training curves.
+    \end{keybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Momentum
+% -----------------------------------------------------------------------------
+\begin{frame}{Momentum: Building Speed}
+    \begin{defbox}[SGD with Momentum]
+        \begin{align*}
+            v_t &= \beta v_{t-1} + \nabla_\theta J(\theta_t) \\
+            \theta_{t+1} &= \theta_t - \eta v_t
+        \end{align*}
+        
+        Typical: $\beta = 0.9$
+    \end{defbox}
+    
+    \vspace{0.2cm}
+    
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \begin{infobox}[Intuition]
+                Like a ball rolling downhill:
+                \begin{itemize}
+                    \item Builds up velocity
+                    \item Carries through flat regions
+                    \item Dampens oscillations
+                \end{itemize}
+            \end{infobox}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.6]
+                % Elongated valley
+                \draw[thick,accentcyan] (0,2) .. controls (1.5,0) and (2.5,0) .. (4,2);
+                \draw[thick,accentcyan] (0,2.5) .. controls (1.5,0.5) and (2.5,0.5) .. (4,2.5);
+                
+                % Without momentum - zigzag
+                \draw[thick,neonpink,dashed] (0.3,2.2) -- (0.8,0.8) -- (1.3,1.8) -- (1.8,0.6);
+                \node[neonpink,font=\tiny] at (0.8,2.5) {no mom.};
+                
+                % With momentum - smooth
+                \draw[thick,neongreen] (0.3,1.8) .. controls (1,1) and (1.5,0.5) .. (2,0.25);
+                \node[neongreen,font=\tiny] at (2.5,1) {with mom.};
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
+    
+    \begin{funnybox}
+        Momentum = memory of past gradients. ``Keep going in the general direction!''
+    \end{funnybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% RMSprop
+% -----------------------------------------------------------------------------
+\begin{frame}{RMSprop: Adaptive Learning Rates}
+    \begin{defbox}[RMSprop (Hinton)]
+        \begin{align*}
+            s_t &= \beta s_{t-1} + (1-\beta) (\nabla_\theta J)^2 \\
+            \theta_{t+1} &= \theta_t - \frac{\eta}{\sqrt{s_t + \epsilon}} \nabla_\theta J
+        \end{align*}
+        
+        Typical: $\beta = 0.9$, $\epsilon = 10^{-8}$
+    \end{defbox}
+    
+    \vspace{0.3cm}
+    
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \begin{keybox}[Key Insight]
+                Divide by running average of gradient magnitudes.
+                
+                \begin{itemize}
+                    \item Large gradients → smaller steps
+                    \item Small gradients → larger steps
+                \end{itemize}
+            \end{keybox}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{infobox}
+                \textbf{Adapts per-parameter!}
+                
+                Different learning rates for different weights based on their gradient history.
+            \end{infobox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Adam
+% -----------------------------------------------------------------------------
+\begin{frame}{Adam: The Best of Both Worlds}
+    \begin{defbox}[Adam (Adaptive Moment Estimation)]
+        \begin{align*}
+            m_t &= \beta_1 m_{t-1} + (1-\beta_1) \nabla_\theta J \quad \text{(momentum)}\\
+            v_t &= \beta_2 v_{t-1} + (1-\beta_2) (\nabla_\theta J)^2 \quad \text{(RMSprop)}\\
+            \hat{m}_t &= \frac{m_t}{1-\beta_1^t}, \quad \hat{v}_t = \frac{v_t}{1-\beta_2^t} \quad \text{(bias correction)}\\
+            \theta_{t+1} &= \theta_t - \frac{\eta}{\sqrt{\hat{v}_t} + \epsilon} \hat{m}_t
+        \end{align*}
+    \end{defbox}
+    
+    \vspace{0.2cm}
+    
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \textbf{Default hyperparameters:}
+            \begin{itemize}
+                \item $\eta = 0.001$
+                \item $\beta_1 = 0.9$ (momentum)
+                \item $\beta_2 = 0.999$ (RMSprop)
+                \item $\epsilon = 10^{-8}$
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{successbox}
+                \textbf{Adam is the default choice!}
+                
+                Works well out of the box for most problems.
+            \end{successbox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Optimizer Comparison
+% -----------------------------------------------------------------------------
+\begin{frame}{Optimizer Comparison}
+    \centering
+    \begin{tikzpicture}[scale=0.9]
+        % Contour plot (simplified)
+        \foreach \r in {0.5,1,1.5,2} {
+            \draw[accentcyan,opacity=0.5] (2,1.5) ellipse ({\r} and {\r*0.5});
+        }
+        
+        % SGD path
+        \draw[thick,neonpink] (0,1.5) -- (0.5,2) -- (1,1) -- (1.5,2) -- (1.8,1.5);
+        \node[neonpink,font=\small] at (0,2.5) {SGD};
+        
+        % Momentum path
+        \draw[thick,neonyellow] (0,0.5) .. controls (1,0.8) and (1.5,1.2) .. (2,1.5);
+        \node[neonyellow,font=\small] at (0,-0.2) {Momentum};
+        
+        % Adam path
+        \draw[thick,neongreen] (4,1.5) .. controls (3.5,1.5) and (2.5,1.5) .. (2,1.5);
+        \node[neongreen,font=\small] at (4.5,1.5) {Adam};
+        
+        % Minimum
+        \fill[white] (2,1.5) circle (3pt);
+        \node[below,fgwhite,font=\small] at (2,1.2) {minimum};
+    \end{tikzpicture}
+    
+    \vspace{0.3cm}
+    
+    \begin{tabular}{lccc}
+        & \textbf{Speed} & \textbf{Stability} & \textbf{Tuning} \\
+        \hline
+        SGD & Medium & Low & Hard \\
+        Momentum & Fast & Medium & Medium \\
+        RMSprop & Fast & High & Easy \\
+        \textbf{Adam} & Fast & High & Easy \\
+    \end{tabular}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Learning Rate Schedules
+% -----------------------------------------------------------------------------
+\begin{frame}{Learning Rate Schedules}
+    \begin{defbox}[Learning Rate Decay]
+        Decrease $\eta$ during training for fine-tuning:
+        
+        \begin{itemize}
+            \item \textbf{Step decay}: $\eta_t = \eta_0 \cdot \gamma^{\lfloor t/s \rfloor}$
+            \item \textbf{Exponential}: $\eta_t = \eta_0 \cdot e^{-\lambda t}$
+            \item \textbf{Cosine annealing}: $\eta_t = \eta_{\min} + \frac{1}{2}(\eta_0 - \eta_{\min})(1 + \cos(\frac{t \pi}{T}))$
+        \end{itemize}
+    \end{defbox}
+    
+    \centering
+    \begin{tikzpicture}[scale=0.6]
+        \draw[->] (0,0) -- (5,0) node[right] {epoch};
+        \draw[->] (0,0) -- (0,3) node[above] {$\eta$};
+        
+        % Step decay
+        \draw[thick,neonpink] (0,2.5) -- (1.5,2.5) -- (1.5,1.5) -- (3,1.5) -- (3,0.8) -- (4.5,0.8);
+        \node[neonpink,font=\tiny,right] at (4.5,0.8) {step};
+        
+        % Exponential
+        \draw[thick,neongreen,domain=0:4.5,samples=50] plot (\x, {2.5*exp(-0.5*\x)});
+        \node[neongreen,font=\tiny,right] at (4.5,0.3) {exp};
+        
+        % Cosine
+        \draw[thick,neonyellow,domain=0:4.5,samples=50] plot (\x, {0.3 + 1.1*(1+cos(\x*40))});
+        \node[neonyellow,font=\tiny,right] at (4.5,1.4) {cosine};
+    \end{tikzpicture}
+    
+    \begin{keybox}
+        \textbf{Warmup}: Start with small $\eta$, gradually increase, then decay.
+    \end{keybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% PyTorch Code
+% -----------------------------------------------------------------------------
+\begin{frame}{Optimizers in PyTorch}
+    \begin{successbox}[PyTorch Implementation]
+        {\small\ttfamily
+        import torch.optim as optim\\[0.3em]
+        model = MyNetwork()\\[0.3em]
+        optimizer = optim.Adam(model.parameters(), lr=0.001)\\
+        \# or: optim.SGD(model.parameters(), lr=0.01, momentum=0.9)\\[0.3em]
+        for epoch in range(num\_epochs):\\
+        \quad for x, y in dataloader:\\
+        \quad\quad optimizer.zero\_grad() \quad \# Clear gradients\\
+        \quad\quad y\_pred = model(x) \quad\quad \# Forward pass\\
+        \quad\quad loss = criterion(y\_pred, y)\\
+        \quad\quad loss.backward() \quad\quad\quad \# Compute gradients\\
+        \quad\quad optimizer.step() \quad\quad\quad \# Update parameters
+        }
+    \end{successbox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Key Takeaways
+% -----------------------------------------------------------------------------
+\begin{frame}{Key Takeaways: Optimization}
+    \begin{keybox}
+        \begin{enumerate}
+            \item \textbf{Gradient Descent}: $\theta \leftarrow \theta - \eta \nabla J$
+            \item \textbf{Mini-batch}: Balance between speed and stability
+            \item \textbf{Momentum}: Accumulate velocity, smooth updates
+            \item \textbf{RMSprop}: Adapt learning rate per parameter
+            \item \textbf{Adam}: Combines momentum + RMSprop
+            \begin{itemize}
+                \item Default choice: $\eta=0.001$, $\beta_1=0.9$, $\beta_2=0.999$
+            \end{itemize}
+            \item \textbf{Learning rate schedule}: Start high, decay over time
+            \item Key workflow: \texttt{zero\_grad() → forward → backward → step()}
+        \end{enumerate}
+    \end{keybox}
+    
+    \vspace{0.2cm}
+    
+    \centering
+    \textit{Next: Preventing overfitting with regularization!}
+\end{frame}

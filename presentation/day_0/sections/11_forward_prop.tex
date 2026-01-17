@@ -1,0 +1,369 @@
+% =============================================================================
+% Section 11: Forward Propagation
+% How information flows through the network
+% =============================================================================
+
+\section{Forward Propagation}
+
+% -----------------------------------------------------------------------------
+% Opening
+% -----------------------------------------------------------------------------
+\begin{frame}{Forward Propagation: Data's Journey}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{funnybox}
+                \textit{``Forward propagation is like a game of telephone, except each person does math before passing the message.''}
+            \end{funnybox}
+            
+            \vspace{0.3cm}
+            
+            \textbf{The Big Picture:}
+            \begin{enumerate}
+                \item Input enters the network
+                \item Each layer transforms it
+                \item Output emerges at the end
+            \end{enumerate}
+            
+            \textit{Direction: Input → Output}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.8]
+                % Simplified flow
+                \node[draw=neongreen,rounded corners,fill=darkgray,minimum width=1.5cm] (in) at (0,3) {Input};
+                \node[draw=accentcyan,rounded corners,fill=darkgray,minimum width=1.5cm] (h1) at (0,1.5) {Hidden 1};
+                \node[draw=accentcyan,rounded corners,fill=darkgray,minimum width=1.5cm] (h2) at (0,0) {Hidden 2};
+                \node[draw=neonpink,rounded corners,fill=darkgray,minimum width=1.5cm] (out) at (0,-1.5) {Output};
+                
+                \draw[->,ultra thick,neonyellow] (in) -- (h1);
+                \draw[->,ultra thick,neonyellow] (h1) -- (h2);
+                \draw[->,ultra thick,neonyellow] (h2) -- (out);
+                
+                % Labels
+                \node[right,font=\small,fgwhite] at (1,2.25) {$W^{[1]}, \mathbf{b}^{[1]}, \sigma$};
+                \node[right,font=\small,fgwhite] at (1,0.75) {$W^{[2]}, \mathbf{b}^{[2]}, \sigma$};
+                \node[right,font=\small,fgwhite] at (1,-0.75) {$W^{[3]}, \mathbf{b}^{[3]}, \sigma$};
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Detailed Example Setup
+% -----------------------------------------------------------------------------
+\begin{frame}{Concrete Example: A 2-Layer Network}
+    \begin{defbox}[Network Configuration]
+        Architecture: 3 → 2 → 1 (input → hidden → output)
+        
+        \begin{itemize}
+            \item Input: $\mathbf{x} = (0.5, 0.8, -0.3)^T$
+            \item Hidden layer: 2 neurons, ReLU activation
+            \item Output layer: 1 neuron, sigmoid activation
+        \end{itemize}
+    \end{defbox}
+    
+    \vspace{0.2cm}
+    
+    \centering
+    \begin{tikzpicture}[scale=1]
+        % Input layer
+        \node[input neuron] (x1) at (0,1.5) {$x_1$};
+        \node[input neuron] (x2) at (0,0) {$x_2$};
+        \node[input neuron] (x3) at (0,-1.5) {$x_3$};
+        
+        % Hidden layer
+        \node[hidden neuron,minimum size=0.9cm] (h1) at (3,0.75) {$h_1$};
+        \node[hidden neuron,minimum size=0.9cm] (h2) at (3,-0.75) {$h_2$};
+        
+        % Output
+        \node[output neuron,minimum size=0.9cm] (y) at (6,0) {$\hat{y}$};
+        
+        % Connections with weights
+        \draw[connection] (x1) -- (h1);
+        \draw[connection] (x1) -- (h2);
+        \draw[connection] (x2) -- (h1);
+        \draw[connection] (x2) -- (h2);
+        \draw[connection] (x3) -- (h1);
+        \draw[connection] (x3) -- (h2);
+        \draw[connection] (h1) -- (y);
+        \draw[connection] (h2) -- (y);
+        
+        % Labels
+        \node[neongreen,font=\small,below] at (0,-2) {Input (3)};
+        \node[accentcyan,font=\small,below] at (3,-1.8) {Hidden (2)};
+        \node[neonpink,font=\small,below] at (6,-0.8) {Output (1)};
+    \end{tikzpicture}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Layer 1 Computation
+% -----------------------------------------------------------------------------
+\begin{frame}{Step 1: Hidden Layer Computation}
+    \textbf{Given weights and biases:}
+    \[
+        W^{[1]} = \begin{pmatrix} 0.2 & 0.4 & -0.5 \\ -0.3 & 0.1 & 0.2 \end{pmatrix}, \quad
+        \mathbf{b}^{[1]} = \begin{pmatrix} 0.1 \\ -0.2 \end{pmatrix}
+    \]
+    
+    \vspace{0.2cm}
+    
+    \textbf{Compute pre-activation:}
+    \begin{align*}
+        \mathbf{z}^{[1]} &= W^{[1]} \mathbf{x} + \mathbf{b}^{[1]} \\
+        &= \begin{pmatrix} 0.2 & 0.4 & -0.5 \\ -0.3 & 0.1 & 0.2 \end{pmatrix}
+        \begin{pmatrix} 0.5 \\ 0.8 \\ -0.3 \end{pmatrix} + \begin{pmatrix} 0.1 \\ -0.2 \end{pmatrix} \\
+        &= \begin{pmatrix} 0.1 + 0.32 + 0.15 + 0.1 \\ -0.15 + 0.08 - 0.06 - 0.2 \end{pmatrix}
+        = \begin{pmatrix} 0.67 \\ -0.33 \end{pmatrix}
+    \end{align*}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Layer 1 Activation
+% -----------------------------------------------------------------------------
+\begin{frame}{Step 1 (continued): Apply Activation}
+    \textbf{Pre-activation:} $\mathbf{z}^{[1]} = (0.67, -0.33)^T$
+    
+    \vspace{0.3cm}
+    
+    \textbf{Apply ReLU:}
+    \[
+        \mathbf{a}^{[1]} = \text{ReLU}(\mathbf{z}^{[1]}) = \begin{pmatrix} \max(0, 0.67) \\ \max(0, -0.33) \end{pmatrix} = \begin{pmatrix} 0.67 \\ 0 \end{pmatrix}
+    \]
+    
+    \vspace{0.3cm}
+    
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \begin{keybox}
+                The negative value becomes 0!
+                
+                ReLU ``kills'' negative activations.
+            \end{keybox}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.7]
+                \node[hidden neuron] (h1) at (0,1) {$0.67$};
+                \node[hidden neuron,fill=darkgray!50] (h2) at (0,-1) {$0$};
+                
+                \node[right,neongreen,font=\small] at (0.8,1) {active};
+                \node[right,neonpink,font=\small] at (0.8,-1) {``dead''};
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Layer 2 Computation
+% -----------------------------------------------------------------------------
+\begin{frame}{Step 2: Output Layer Computation}
+    \textbf{Output layer weights and biases:}
+    \[
+        W^{[2]} = \begin{pmatrix} 0.6 & -0.4 \end{pmatrix}, \quad
+        b^{[2]} = 0.3
+    \]
+    
+    \vspace{0.2cm}
+    
+    \textbf{Compute pre-activation:}
+    \begin{align*}
+        z^{[2]} &= W^{[2]} \mathbf{a}^{[1]} + b^{[2]} \\
+        &= \begin{pmatrix} 0.6 & -0.4 \end{pmatrix} \begin{pmatrix} 0.67 \\ 0 \end{pmatrix} + 0.3 \\
+        &= 0.402 + 0 + 0.3 = 0.702
+    \end{align*}
+    
+    \vspace{0.2cm}
+    
+    \textbf{Apply sigmoid:}
+    \[
+        \hat{y} = \sigma(z^{[2]}) = \frac{1}{1 + e^{-0.702}} \approx \boxed{0.669}
+    \]
+    
+    \begin{keybox}
+        Final prediction: 66.9\% probability for class 1
+    \end{keybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Summary of Forward Pass
+% -----------------------------------------------------------------------------
+\begin{frame}{Forward Pass Summary}
+    \centering
+    \begin{tikzpicture}[scale=0.85]
+        % Input
+        \node[draw=neongreen,rounded corners,fill=darkgray,minimum height=1cm] (x) at (0,0) {$\mathbf{x} = \begin{pmatrix} 0.5 \\ 0.8 \\ -0.3 \end{pmatrix}$};
+        
+        % z1
+        \node[draw=accentcyan,rounded corners,fill=darkgray,minimum height=1cm] (z1) at (3,0) {$\mathbf{z}^{[1]} = \begin{pmatrix} 0.67 \\ -0.33 \end{pmatrix}$};
+        
+        % a1
+        \node[draw=accentcyan,rounded corners,fill=darkgray,minimum height=1cm] (a1) at (6,0) {$\mathbf{a}^{[1]} = \begin{pmatrix} 0.67 \\ 0 \end{pmatrix}$};
+        
+        % z2
+        \node[draw=neonpink,rounded corners,fill=darkgray,minimum height=0.8cm] (z2) at (9,0) {$z^{[2]} = 0.702$};
+        
+        % y
+        \node[draw=neonyellow,rounded corners,fill=darkgray,minimum height=0.8cm] (y) at (12,0) {$\hat{y} = 0.669$};
+        
+        % Arrows
+        \draw[->,thick,fgwhite] (x) -- (z1) node[midway,above,font=\tiny] {$W^{[1]}\mathbf{x} + \mathbf{b}^{[1]}$};
+        \draw[->,thick,fgwhite] (z1) -- (a1) node[midway,above,font=\tiny] {ReLU};
+        \draw[->,thick,fgwhite] (a1) -- (z2) node[midway,above,font=\tiny] {$W^{[2]}\mathbf{a}^{[1]} + b^{[2]}$};
+        \draw[->,thick,fgwhite] (z2) -- (y) node[midway,above,font=\tiny] {sigmoid};
+    \end{tikzpicture}
+    
+    \vspace{0.5cm}
+    
+    \begin{funnybox}
+        From 3 numbers in to 1 number out. That's forward propagation!
+        
+        \textit{(All the matrix multiplication happens behind the scenes)}
+    \end{funnybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Batch Processing
+% -----------------------------------------------------------------------------
+\begin{frame}{Batching: Multiple Samples at Once}
+    \begin{defbox}[Batch Forward Pass]
+        Instead of one input $\mathbf{x}$, process $m$ samples simultaneously:
+        \[
+            X = \begin{pmatrix} | & | & & | \\ \mathbf{x}^{(1)} & \mathbf{x}^{(2)} & \cdots & \mathbf{x}^{(m)} \\ | & | & & | \end{pmatrix} \in \mathbb{R}^{n \times m}
+        \]
+    \end{defbox}
+    
+    \vspace{0.2cm}
+    
+    \textbf{Layer computation (vectorized):}
+    \[
+        Z^{[l]} = W^{[l]} A^{[l-1]} + \mathbf{b}^{[l]}, \quad A^{[l]} = \sigma(Z^{[l]})
+    \]
+    
+    \vspace{0.2cm}
+    
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \begin{keybox}[Why batch?]
+                \begin{itemize}
+                    \item GPU parallelization
+                    \item Faster training
+                    \item Better gradient estimates
+                \end{itemize}
+            \end{keybox}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{infobox}[Typical batch sizes]
+                32, 64, 128, 256...
+                
+                (powers of 2 for efficiency)
+            \end{infobox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Computational Graph
+% -----------------------------------------------------------------------------
+\begin{frame}{Computational Graph View}
+    \begin{defbox}[Computational Graph]
+        A \glow{computational graph} represents the network as a directed graph where:
+        \begin{itemize}
+            \item Nodes = operations or variables
+            \item Edges = data flow
+        \end{itemize}
+    \end{defbox}
+    
+    \centering
+    \begin{tikzpicture}[scale=0.75]
+        % Variables
+        \node[draw=neongreen,circle,fill=darkgray] (x) at (0,0) {$\mathbf{x}$};
+        \node[draw=accentcyan,circle,fill=darkgray] (W1) at (0,2) {$W^{[1]}$};
+        \node[draw=accentcyan,circle,fill=darkgray] (b1) at (2,2) {$\mathbf{b}^{[1]}$};
+        
+        % Operations
+        \node[draw=neonyellow,rectangle,fill=darkgray] (matmul1) at (2,0) {$\times$};
+        \node[draw=neonyellow,rectangle,fill=darkgray] (add1) at (4,0) {$+$};
+        \node[draw=neonyellow,rectangle,fill=darkgray] (relu) at (6,0) {ReLU};
+        
+        \node[draw=accentcyan,circle,fill=darkgray] (W2) at (6,2) {$W^{[2]}$};
+        \node[draw=accentcyan,circle,fill=darkgray] (b2) at (8,2) {$b^{[2]}$};
+        
+        \node[draw=neonyellow,rectangle,fill=darkgray] (matmul2) at (8,0) {$\times$};
+        \node[draw=neonyellow,rectangle,fill=darkgray] (add2) at (10,0) {$+$};
+        \node[draw=neonyellow,rectangle,fill=darkgray] (sig) at (12,0) {$\sigma$};
+        
+        \node[draw=neonpink,circle,fill=darkgray] (y) at (14,0) {$\hat{y}$};
+        
+        % Edges
+        \draw[->,thick] (x) -- (matmul1);
+        \draw[->,thick] (W1) -- (matmul1);
+        \draw[->,thick] (matmul1) -- (add1);
+        \draw[->,thick] (b1) -- (add1);
+        \draw[->,thick] (add1) -- (relu);
+        \draw[->,thick] (relu) -- (matmul2);
+        \draw[->,thick] (W2) -- (matmul2);
+        \draw[->,thick] (matmul2) -- (add2);
+        \draw[->,thick] (b2) -- (add2);
+        \draw[->,thick] (add2) -- (sig);
+        \draw[->,thick] (sig) -- (y);
+    \end{tikzpicture}
+    
+    \vspace{0.3cm}
+    
+    \begin{keybox}
+        PyTorch and TensorFlow build these graphs automatically!
+        
+        Used for automatic differentiation (backprop).
+    \end{keybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Code Preview
+% -----------------------------------------------------------------------------
+\begin{frame}{Forward Pass in PyTorch}
+    \begin{successbox}[PyTorch Implementation]
+        {\small\ttfamily
+        import torch\\
+        import torch.nn as nn\\[0.5em]
+        class SimpleNet(nn.Module):\\
+        \quad def \_\_init\_\_(self):\\
+        \quad\quad super().\_\_init\_\_()\\
+        \quad\quad self.hidden = nn.Linear(3, 2)\\
+        \quad\quad self.output = nn.Linear(2, 1)\\
+        \quad\quad self.relu = nn.ReLU()\\
+        \quad\quad self.sigmoid = nn.Sigmoid()\\[0.5em]
+        \quad def forward(self, x):\\
+        \quad\quad x = self.relu(self.hidden(x))\\
+        \quad\quad x = self.sigmoid(self.output(x))\\
+        \quad\quad return x\\[0.5em]
+        model = SimpleNet()\\
+        x = torch.tensor([0.5, 0.8, -0.3])\\
+        y\_pred = model(x)
+        }
+    \end{successbox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Key Takeaways
+% -----------------------------------------------------------------------------
+\begin{frame}{Key Takeaways: Forward Propagation}
+    \begin{keybox}
+        \begin{enumerate}
+            \item \textbf{Forward propagation} = data flows input → output
+            \item Each layer: $\mathbf{a}^{[l]} = \sigma(W^{[l]} \mathbf{a}^{[l-1]} + \mathbf{b}^{[l]})$
+            \item Steps per layer:
+            \begin{itemize}
+                \item Linear: $\mathbf{z} = W\mathbf{a} + \mathbf{b}$
+                \item Activation: $\mathbf{a} = \sigma(\mathbf{z})$
+            \end{itemize}
+            \item \textbf{Batching}: Process multiple samples simultaneously
+            \item \textbf{Computational graph}: Framework builds automatically
+            \item Forward pass produces \textbf{prediction} $\hat{y}$
+        \end{enumerate}
+    \end{keybox}
+    
+    \vspace{0.2cm}
+    
+    \centering
+    \textit{Next: How do we measure if the prediction is any good? Loss functions!}
+\end{frame}

@@ -1,0 +1,383 @@
+% =============================================================================
+% Section 19: KL Divergence & Information Theory
+% Entropy, cross-entropy, and KL divergence in ML
+% =============================================================================
+
+\section{KL Divergence \& Information Theory}
+
+% -----------------------------------------------------------------------------
+% Opening
+% -----------------------------------------------------------------------------
+\begin{frame}{Information Theory: The Math of Surprise}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{funnybox}
+                \textit{``Information theory tells us: rare events are surprising, common events are boring. Just like plot twists!''}
+            \end{funnybox}
+            
+            \vspace{0.3cm}
+            
+            \textbf{Why for ML?}
+            \begin{itemize}
+                \item Cross-entropy loss
+                \item Measuring distribution similarity
+                \item Understanding predictions
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{defbox}[Information Content]
+                The \glow{information} (surprise) of event with probability $p$:
+                \[
+                    I(x) = -\log_2(p(x)) \text{ bits}
+                \]
+                
+                \vspace{0.2cm}
+                
+                \begin{itemize}
+                    \item $p = 1$ (certain): 0 bits
+                    \item $p = 0.5$: 1 bit
+                    \item $p = 0.01$: 6.64 bits
+                \end{itemize}
+            \end{defbox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Entropy
+% -----------------------------------------------------------------------------
+\begin{frame}{Entropy: Average Surprise}
+    \begin{defbox}[Shannon Entropy]
+        The \glow{entropy} of a distribution $P$ is the expected information:
+        \[
+            H(P) = -\sum_{x} p(x) \log p(x) = \mathbb{E}_{x \sim P}[-\log p(x)]
+        \]
+    \end{defbox}
+    
+    \vspace{0.2cm}
+    
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \textbf{Binary entropy:}
+            \centering
+            \begin{tikzpicture}[scale=0.6]
+                \draw[->] (0,0) -- (4,0) node[right] {$p$};
+                \draw[->] (0,0) -- (0,2.5) node[above] {$H$};
+                
+                \draw[thick,neonpink,domain=0.01:0.99,samples=50] 
+                    plot (\x*4, {-\x*ln(\x)/ln(2) - (1-\x)*ln(1-\x)/ln(2)});
+                
+                \fill[neongreen] (0,0) circle (2pt);
+                \fill[neongreen] (4,0) circle (2pt);
+                \fill[neonyellow] (2,2) circle (2pt);
+                
+                \node[below,font=\tiny] at (2,0) {0.5};
+                \node[above,font=\tiny,neonyellow] at (2,2) {max};
+            \end{tikzpicture}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{keybox}[Properties]
+                \begin{itemize}
+                    \item $H \geq 0$ always
+                    \item Max when uniform
+                    \item Min (= 0) when deterministic
+                    \item Units: bits (log$_2$) or nats (ln)
+                \end{itemize}
+            \end{keybox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Cross-Entropy
+% -----------------------------------------------------------------------------
+\begin{frame}{Cross-Entropy: Comparing Distributions}
+    \begin{defbox}[Cross-Entropy]
+        The \glow{cross-entropy} between true distribution $P$ and predicted distribution $Q$:
+        \[
+            H(P, Q) = -\sum_{x} p(x) \log q(x) = \mathbb{E}_{x \sim P}[-\log q(x)]
+        \]
+    \end{defbox}
+    
+    \vspace{0.3cm}
+    
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \begin{keybox}[Interpretation]
+                Average bits needed to encode data from $P$ using code optimized for $Q$.
+                
+                \vspace{0.2cm}
+                
+                If $Q \neq P$: We're using a ``wrong'' code!
+            \end{keybox}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{infobox}[In ML]
+                \begin{itemize}
+                    \item $P$ = true labels (one-hot)
+                    \item $Q$ = predicted probabilities
+                    \item $H(P,Q)$ = cross-entropy loss!
+                \end{itemize}
+            \end{infobox}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.2cm}
+    
+    \[
+        \mathcal{L}_{CE} = -\sum_{c} y_c \log(\hat{y}_c) = H(\mathbf{y}, \hat{\mathbf{y}})
+    \]
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% KL Divergence Definition
+% -----------------------------------------------------------------------------
+\begin{frame}{KL Divergence: How Different Are Two Distributions?}
+    \begin{defbox}[Kullback-Leibler Divergence]
+        The \glow{KL divergence} from $Q$ to $P$:
+        \[
+            D_{KL}(P \| Q) = \sum_{x} p(x) \log \frac{p(x)}{q(x)} = \mathbb{E}_{x \sim P}\left[\log \frac{p(x)}{q(x)}\right]
+        \]
+    \end{defbox}
+    
+    \vspace{0.2cm}
+    
+    \begin{keybox}[Key Relationship]
+        \[
+            D_{KL}(P \| Q) = H(P, Q) - H(P)
+        \]
+        
+        Cross-entropy = Entropy + KL divergence
+        
+        \vspace{0.2cm}
+        
+        When minimizing cross-entropy with fixed $P$, we're minimizing KL divergence!
+    \end{keybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% KL Properties
+% -----------------------------------------------------------------------------
+\begin{frame}{Properties of KL Divergence}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{thmbox}[Gibbs' Inequality]
+                \[
+                    D_{KL}(P \| Q) \geq 0
+                \]
+                
+                with equality iff $P = Q$ (almost everywhere)
+            \end{thmbox}
+            
+            \begin{alertbox}[Not Symmetric!]
+                \[
+                    D_{KL}(P \| Q) \neq D_{KL}(Q \| P)
+                \]
+                
+                KL divergence is NOT a distance metric!
+            \end{alertbox}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.7]
+                % P distribution
+                \draw[thick,neongreen,domain=-2:2,samples=50] 
+                    plot (\x+2.5, {1.5*exp(-\x*\x)});
+                \node[neongreen,font=\small] at (2.5,2) {$P$};
+                
+                % Q distribution (shifted)
+                \draw[thick,neonpink,domain=-2:2,samples=50] 
+                    plot (\x+3.5, {1.2*exp(-0.8*\x*\x)});
+                \node[neonpink,font=\small] at (3.5,1.8) {$Q$};
+                
+                \draw[->] (0,0) -- (6,0) node[right] {$x$};
+                \draw[->] (0,0) -- (0,2) node[above] {};
+                
+                % KL arrow
+                \draw[<->,thick,neonyellow] (2.5,0.3) -- (3.5,0.3);
+                \node[neonyellow,below,font=\tiny] at (3,0.3) {$D_{KL}$};
+            \end{tikzpicture}
+            
+            \begin{funnybox}
+                $D_{KL}(P\|Q)$ asks: ``How surprised is $Q$ by data from $P$?''
+            \end{funnybox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Forward vs Reverse KL
+% -----------------------------------------------------------------------------
+\begin{frame}{Forward vs Reverse KL}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{defbox}[Forward KL: $D_{KL}(P \| Q)$]
+                Minimize: $\mathbb{E}_P[\log P - \log Q]$
+                
+                \begin{itemize}
+                    \item $Q$ must cover all of $P$
+                    \item \textbf{Mean-seeking}
+                    \item Used in variational inference (ELBO)
+                \end{itemize}
+                
+                \centering
+                \begin{tikzpicture}[scale=0.5]
+                    % Bimodal P
+                    \draw[thick,neongreen,domain=-2:2,samples=50] 
+                        plot (\x, {0.7*exp(-4*(\x+0.7)*(\x+0.7)) + 0.7*exp(-4*(\x-0.7)*(\x-0.7))});
+                    % Q covers both
+                    \draw[thick,neonpink,domain=-2:2,samples=50] 
+                        plot (\x, {0.6*exp(-0.5*\x*\x)});
+                    \draw[->] (-2,0) -- (2,0);
+                \end{tikzpicture}
+            \end{defbox}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{defbox}[Reverse KL: $D_{KL}(Q \| P)$]
+                Minimize: $\mathbb{E}_Q[\log Q - \log P]$
+                
+                \begin{itemize}
+                    \item $Q$ can ignore parts of $P$
+                    \item \textbf{Mode-seeking}
+                    \item Used in policy gradient, GANs
+                \end{itemize}
+                
+                \centering
+                \begin{tikzpicture}[scale=0.5]
+                    % Bimodal P
+                    \draw[thick,neongreen,domain=-2:2,samples=50] 
+                        plot (\x, {0.7*exp(-4*(\x+0.7)*(\x+0.7)) + 0.7*exp(-4*(\x-0.7)*(\x-0.7))});
+                    % Q picks one mode
+                    \draw[thick,neonpink,domain=-2:2,samples=50] 
+                        plot (\x, {0.9*exp(-4*(\x-0.7)*(\x-0.7))});
+                    \draw[->] (-2,0) -- (2,0);
+                \end{tikzpicture}
+            \end{defbox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% KL in ML Applications
+% -----------------------------------------------------------------------------
+\begin{frame}{KL Divergence in Machine Learning}
+    \begin{enumerate}
+        \item \textbf{Cross-entropy loss}: Minimizes $D_{KL}(\text{true} \| \text{pred})$
+        
+        \item \textbf{Variational Autoencoders (VAE)}:
+        \[
+            \mathcal{L}_{VAE} = \text{reconstruction} + D_{KL}(q(z|x) \| p(z))
+        \]
+        
+        \item \textbf{Knowledge Distillation}:
+        \[
+            \mathcal{L}_{KD} = D_{KL}(\text{teacher} \| \text{student})
+        \]
+        
+        \item \textbf{Reinforcement Learning}: Policy optimization bounds
+        
+        \item \textbf{Bayesian inference}: Variational approximations
+    \end{enumerate}
+    
+    \begin{keybox}
+        KL divergence is everywhere in modern ML — it measures how ``different'' one distribution is from another!
+    \end{keybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Mutual Information
+% -----------------------------------------------------------------------------
+\begin{frame}{Mutual Information: Shared Information}
+    \begin{defbox}[Mutual Information]
+        \[
+            I(X; Y) = D_{KL}(P(X,Y) \| P(X)P(Y)) = H(X) - H(X|Y)
+        \]
+        
+        How much knowing $Y$ tells us about $X$.
+    \end{defbox}
+    
+    \vspace{0.2cm}
+    
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.7]
+                % Venn diagram
+                \draw[thick,fill=neongreen,opacity=0.3] (-0.5,0) circle (1.2);
+                \draw[thick,fill=neonpink,opacity=0.3] (0.5,0) circle (1.2);
+                
+                \node[neongreen] at (-1.2,0) {$H(X)$};
+                \node[neonpink] at (1.2,0) {$H(Y)$};
+                \node[neonyellow] at (0,0) {$I$};
+            \end{tikzpicture}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{keybox}[Properties]
+                \begin{itemize}
+                    \item $I(X;Y) \geq 0$
+                    \item $I(X;Y) = I(Y;X)$ (symmetric!)
+                    \item $I(X;Y) = 0$ iff independent
+                    \item $I(X;X) = H(X)$
+                \end{itemize}
+            \end{keybox}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.2cm}
+    
+    \begin{infobox}
+        Used in: feature selection, information bottleneck, representation learning
+    \end{infobox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Summary Table
+% -----------------------------------------------------------------------------
+\begin{frame}{Information Theory Summary}
+    \centering
+    \begin{tabular}{lll}
+        \textbf{Quantity} & \textbf{Formula} & \textbf{Meaning} \\
+        \hline
+        Information & $-\log p(x)$ & Surprise of event \\[0.5em]
+        Entropy $H(P)$ & $\mathbb{E}_P[-\log p]$ & Average surprise \\[0.5em]
+        Cross-entropy & $\mathbb{E}_P[-\log q]$ & Bits using wrong code \\[0.5em]
+        KL divergence & $\mathbb{E}_P[\log p/q]$ & Distribution difference \\[0.5em]
+        Mutual info & $D_{KL}(P_{XY} \| P_X P_Y)$ & Shared information \\
+    \end{tabular}
+    
+    \vspace{0.5cm}
+    
+    \begin{keybox}[Key Relationships]
+        \begin{align*}
+            H(P,Q) &= H(P) + D_{KL}(P \| Q) \\
+            I(X;Y) &= H(X) + H(Y) - H(X,Y) \\
+            D_{KL}(P \| Q) &\geq 0 \text{ with equality iff } P = Q
+        \end{align*}
+    \end{keybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Key Takeaways
+% -----------------------------------------------------------------------------
+\begin{frame}{Key Takeaways: Information Theory}
+    \begin{keybox}
+        \begin{enumerate}
+            \item \textbf{Information}: $-\log p$ — rare events have more info
+            \item \textbf{Entropy}: Average information = uncertainty measure
+            \item \textbf{Cross-entropy}: Using ``wrong'' distribution for encoding
+            \begin{itemize}
+                \item This is our classification loss!
+            \end{itemize}
+            \item \textbf{KL divergence}: Measures distribution difference
+            \begin{itemize}
+                \item Not symmetric, not a true distance
+                \item Forward vs reverse have different behaviors
+            \end{itemize}
+            \item \textbf{Mutual information}: Shared information between variables
+            \item Minimizing cross-entropy = minimizing KL from true distribution
+        \end{enumerate}
+    \end{keybox}
+    
+    \centering
+    \textit{Next: The classic MNIST dataset!}
+\end{frame}

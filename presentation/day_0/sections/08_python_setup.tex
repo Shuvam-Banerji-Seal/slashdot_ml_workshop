@@ -1,0 +1,369 @@
+% =============================================================================
+% Section 8: Python Environment Setup
+% Setting up uv, virtual environments, and project structure
+% =============================================================================
+
+\section{Python Environment Setup}
+
+% -----------------------------------------------------------------------------
+% Opening
+% -----------------------------------------------------------------------------
+\begin{frame}{Python Environment Setup}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{funnybox}
+                \textit{``Before we teach a machine to learn, we must first teach our computer to find Python. And not just any Python --- the RIGHT Python!''}
+            \end{funnybox}
+            
+            \vspace{0.3cm}
+            
+            \textbf{Why environments matter:}
+            \begin{itemize}
+                \item Different projects need different packages
+                \item Version conflicts are REAL
+                \item Reproducibility is essential
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.7]
+                % Computer
+                \draw[thick,accentcyan,rounded corners] (0,0) rectangle (4,3);
+                \node[accentcyan] at (2,2.5) {Your Computer};
+                
+                % Virtual envs
+                \draw[thick,neonpink,rounded corners] (0.3,0.3) rectangle (1.8,1.8);
+                \node[neonpink,font=\tiny] at (1.05,1.5) {Project A};
+                \node[font=\tiny,fgwhite] at (1.05,1.0) {numpy 1.21};
+                \node[font=\tiny,fgwhite] at (1.05,0.6) {torch 2.0};
+                
+                \draw[thick,neongreen,rounded corners] (2.2,0.3) rectangle (3.7,1.8);
+                \node[neongreen,font=\tiny] at (2.95,1.5) {Project B};
+                \node[font=\tiny,fgwhite] at (2.95,1.0) {numpy 1.24};
+                \node[font=\tiny,fgwhite] at (2.95,0.6) {torch 1.9};
+            \end{tikzpicture}
+            
+            \vspace{0.2cm}
+            \textit{Isolated environments = no conflicts!}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Why UV?
+% -----------------------------------------------------------------------------
+\begin{frame}{Enter: \texttt{uv} --- The Fast Python Package Manager}
+    \begin{defbox}[What is uv?]
+        \texttt{uv} is an extremely fast Python package and project manager, written in Rust.
+        
+        \begin{itemize}
+            \item 10-100x faster than pip
+            \item Handles virtual environments automatically
+            \item Modern project management
+            \item Replaces: pip, pip-tools, virtualenv, poetry, pyenv
+        \end{itemize}
+    \end{defbox}
+    
+    \vspace{0.3cm}
+    
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \begin{alertbox}[Installing uv]
+                \textbf{macOS/Linux:}
+                
+                \texttt{curl -LsSf https://astral.sh/uv/install.sh | sh}
+                
+                \vspace{0.2cm}
+                \textbf{Windows:}
+                
+                \texttt{powershell -c "irm https://astral.sh/uv/install.ps1 | iex"}
+            \end{alertbox}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{funnybox}
+                Why ``uv''? 
+                
+                Because it's so fast it operates at \textbf{UV frequencies} --- ultraviolet light! 
+                
+                (Actually, it's just a cool name.)
+            \end{funnybox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% uv init
+% -----------------------------------------------------------------------------
+\begin{frame}{Creating a New Project: \texttt{uv init}}
+    \begin{defbox}[uv init]
+        Creates a new Python project with proper structure:
+        
+        \texttt{uv init my\_ml\_project}
+        
+        \texttt{cd my\_ml\_project}
+    \end{defbox}
+    
+    \vspace{0.3cm}
+    
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \textbf{What gets created:}
+            
+            \texttt{my\_ml\_project/}
+            
+            \quad \texttt{+-- .python-version}
+            
+            \quad \texttt{+-- pyproject.toml}
+            
+            \quad \texttt{+-- README.md}
+            
+            \quad \texttt{+-- hello.py}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{keybox}[Key Files]
+                \begin{itemize}
+                    \item \texttt{.python-version}: Python version
+                    \item \texttt{pyproject.toml}: Project config
+                    \item \texttt{README.md}: Documentation
+                    \item \texttt{hello.py}: Sample code
+                \end{itemize}
+            \end{keybox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% pyproject.toml
+% -----------------------------------------------------------------------------
+\begin{frame}{Understanding \texttt{pyproject.toml}}
+    \begin{defbox}[pyproject.toml]
+        The \textbf{modern standard} for Python project configuration.
+        
+        Defines: name, version, dependencies, tools, scripts.
+    \end{defbox}
+    
+    \vspace{0.2cm}
+    
+    \begin{columns}
+        \begin{column}{0.55\textwidth}
+            {\small\ttfamily
+            [project]\\
+            name = "ml-workshop"\\
+            version = "0.1.0"\\
+            requires-python = ">=3.11"\\
+            dependencies = [\\
+            \quad "numpy>=1.24.0",\\
+            \quad "torch>=2.0.0",\\
+            ]\\
+            \\
+            {[tool.uv]}\\
+            dev-dependencies = [\\
+            \quad "pytest>=7.0.0",\\
+            ]
+            }
+        \end{column}
+        \begin{column}{0.45\textwidth}
+            \begin{keybox}[Sections]
+                \begin{itemize}
+                    \item \texttt{[project]}: Metadata
+                    \item \texttt{dependencies}: Runtime deps
+                    \item \texttt{[tool.uv]}: uv-specific
+                    \item \texttt{dev-dependencies}: Dev tools
+                \end{itemize}
+            \end{keybox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% uv sync
+% -----------------------------------------------------------------------------
+\begin{frame}{Installing Dependencies: \texttt{uv sync}}
+    \begin{defbox}[uv sync]
+        The \textbf{magic command} that:
+        \begin{itemize}
+            \item Creates a virtual environment (if needed)
+            \item Installs all dependencies from pyproject.toml
+            \item Locks versions in \texttt{uv.lock}
+        \end{itemize}
+    \end{defbox}
+    
+    \vspace{0.3cm}
+    
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \textbf{Basic usage:}
+            
+            \texttt{\$ uv sync}
+            
+            \vspace{0.2cm}
+            \textbf{With dev dependencies:}
+            
+            \texttt{\$ uv sync --dev}
+            
+            \vspace{0.2cm}
+            \textbf{Add new package:}
+            
+            \texttt{\$ uv add pandas}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{keybox}[Lock File]
+                \texttt{uv.lock} ensures:
+                \begin{itemize}
+                    \item Exact reproducibility
+                    \item Same versions everywhere
+                    \item Commit to git!
+                \end{itemize}
+            \end{keybox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Running Python with uv
+% -----------------------------------------------------------------------------
+\begin{frame}{Running Python with \texttt{uv}}
+    \begin{defbox}[uv run]
+        Run commands in the project's virtual environment:
+        
+        \texttt{uv run python script.py}
+        
+        \texttt{uv run pytest}
+        
+        \texttt{uv run jupyter notebook}
+    \end{defbox}
+    
+    \vspace{0.3cm}
+    
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \begin{alertbox}[No Activation Needed!]
+                Unlike traditional venvs:
+                \begin{itemize}
+                    \item No \texttt{source .venv/bin/activate}
+                    \item No \texttt{deactivate}
+                    \item Just prefix with \texttt{uv run}
+                \end{itemize}
+            \end{alertbox}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{funnybox}
+                Think of \texttt{uv run} as a magic portal that teleports your command into the right Python universe!
+            \end{funnybox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Workshop Setup
+% -----------------------------------------------------------------------------
+\begin{frame}{Setting Up Our Workshop Environment}
+    \begin{keybox}[Step by Step]
+        \begin{enumerate}
+            \item Install uv (if not done)
+            \item Clone/create workshop project
+            \item Run \texttt{uv sync}
+            \item Start coding!
+        \end{enumerate}
+    \end{keybox}
+    
+    \vspace{0.3cm}
+    
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \textbf{Our dependencies:}
+            \begin{itemize}
+                \item \texttt{numpy} --- numerical computing
+                \item \texttt{torch} --- deep learning
+                \item \texttt{matplotlib} --- plotting
+                \item \texttt{scikit-learn} --- ML algorithms
+                \item \texttt{jupyter} --- notebooks
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.8]
+                \node[rectangle,draw=accentcyan,fill=darkgray,minimum width=2cm,minimum height=0.6cm] (uv) at (0,2) {\texttt{uv}};
+                \node[rectangle,draw=neonpink,fill=darkgray,minimum width=1.5cm,minimum height=0.5cm] (np) at (-1.5,0) {numpy};
+                \node[rectangle,draw=neonpink,fill=darkgray,minimum width=1.5cm,minimum height=0.5cm] (torch) at (0,0) {torch};
+                \node[rectangle,draw=neonpink,fill=darkgray,minimum width=1.5cm,minimum height=0.5cm] (mpl) at (1.5,0) {mpl};
+                
+                \draw[->,accentcyan] (uv) -- (np);
+                \draw[->,accentcyan] (uv) -- (torch);
+                \draw[->,accentcyan] (uv) -- (mpl);
+            \end{tikzpicture}
+            
+            \textit{uv manages everything!}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Quick Reference
+% -----------------------------------------------------------------------------
+\begin{frame}{Quick Reference: Essential \texttt{uv} Commands}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{defbox}[Project Setup]
+                \texttt{uv init} --- Create project
+                
+                \texttt{uv sync} --- Install dependencies
+                
+                \texttt{uv add PKG} --- Add package
+                
+                \texttt{uv remove PKG} --- Remove package
+            \end{defbox}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{defbox}[Running Code]
+                \texttt{uv run python X.py}
+                
+                \texttt{uv run pytest}
+                
+                \texttt{uv run jupyter notebook}
+                
+                \texttt{uv run CMD}
+            \end{defbox}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.3cm}
+    
+    \begin{keybox}[Remember]
+        \begin{itemize}
+            \item Always use \texttt{uv run} to execute Python in the project environment
+            \item Commit both \texttt{pyproject.toml} AND \texttt{uv.lock} to version control
+            \item Run \texttt{uv sync} after pulling changes
+        \end{itemize}
+    \end{keybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Summary
+% -----------------------------------------------------------------------------
+\begin{frame}{Python Setup: Summary}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{keybox}[What We Learned]
+                \begin{itemize}
+                    \item Why virtual environments matter
+                    \item How to use \texttt{uv} for fast package management
+                    \item Project structure with \texttt{pyproject.toml}
+                    \item Running code with \texttt{uv run}
+                \end{itemize}
+            \end{keybox}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{funnybox}
+                Now your Python environment is ready for machine learning!
+                
+                Let's make those neurons fire!
+            \end{funnybox}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.5cm}
+    
+    \centering
+    \textbf{Next: Neural Networks!}
+\end{frame}

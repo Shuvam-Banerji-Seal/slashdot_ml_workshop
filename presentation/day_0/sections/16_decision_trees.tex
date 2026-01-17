@@ -1,0 +1,395 @@
+% =============================================================================
+% Section 16: Decision Trees
+% Tree-based learning methods
+% =============================================================================
+
+\section{Decision Trees}
+
+% -----------------------------------------------------------------------------
+% Opening
+% -----------------------------------------------------------------------------
+\begin{frame}{Decision Trees: Asking the Right Questions}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{funnybox}
+                \textit{``Decision trees are like a game of 20 questions, except the computer picks the questions AND answers them!''}
+            \end{funnybox}
+            
+            \vspace{0.3cm}
+            
+            \textbf{Key Ideas:}
+            \begin{itemize}
+                \item Split data with yes/no questions
+                \item Each split = one decision
+                \item Leaves = final predictions
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \centering
+            \begin{tikzpicture}[
+                scale=0.7,
+                level distance=1.2cm,
+                level 1/.style={sibling distance=3cm},
+                level 2/.style={sibling distance=1.5cm}
+            ]
+                \node[draw=accentcyan,rounded corners,fill=darkgray] {Age $> 30$?}
+                    child {
+                        node[draw=accentcyan,rounded corners,fill=darkgray] {Income $> 50k$?}
+                        child {node[draw=neongreen,rounded corners,fill=darkgray] {Buy}}
+                        child {node[draw=neonpink,rounded corners,fill=darkgray] {No}}
+                        edge from parent node[left,font=\tiny] {yes}
+                    }
+                    child {
+                        node[draw=accentcyan,rounded corners,fill=darkgray] {Student?}
+                        child {node[draw=neongreen,rounded corners,fill=darkgray] {Buy}}
+                        child {node[draw=neonpink,rounded corners,fill=darkgray] {No}}
+                        edge from parent node[right,font=\tiny] {no}
+                    };
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Tree Structure
+% -----------------------------------------------------------------------------
+\begin{frame}{Anatomy of a Decision Tree}
+    \begin{defbox}[Decision Tree Components]
+        \begin{itemize}
+            \item \textbf{Root}: Top node (first question)
+            \item \textbf{Internal nodes}: Decision points (questions)
+            \item \textbf{Branches}: Answers (yes/no or thresholds)
+            \item \textbf{Leaves}: Final predictions
+        \end{itemize}
+    \end{defbox}
+    
+    \centering
+    \begin{tikzpicture}[scale=0.8]
+        % Root
+        \node[draw=neonyellow,thick,rounded corners,fill=darkgray] (root) at (0,0) {$x_1 < 5$?};
+        \node[neonyellow,left,font=\small] at (-1.5,0) {Root};
+        
+        % Level 1
+        \node[draw=accentcyan,rounded corners,fill=darkgray] (l1) at (-2,-1.5) {$x_2 > 3$?};
+        \node[draw=accentcyan,rounded corners,fill=darkgray] (r1) at (2,-1.5) {$x_3 = A$?};
+        \node[accentcyan,font=\small] at (-4,-1.5) {Internal};
+        
+        % Leaves
+        \node[draw=neongreen,rounded corners,fill=darkgray] (ll) at (-3,-3) {Class 1};
+        \node[draw=neonpink,rounded corners,fill=darkgray] (lr) at (-1,-3) {Class 0};
+        \node[draw=neongreen,rounded corners,fill=darkgray] (rl) at (1,-3) {Class 1};
+        \node[draw=neonpink,rounded corners,fill=darkgray] (rr) at (3,-3) {Class 0};
+        \node[neongreen,font=\small] at (-4.5,-3) {Leaves};
+        
+        % Edges
+        \draw[thick] (root) -- (l1) node[midway,left,font=\tiny] {yes};
+        \draw[thick] (root) -- (r1) node[midway,right,font=\tiny] {no};
+        \draw[thick] (l1) -- (ll) node[midway,left,font=\tiny] {yes};
+        \draw[thick] (l1) -- (lr) node[midway,right,font=\tiny] {no};
+        \draw[thick] (r1) -- (rl) node[midway,left,font=\tiny] {yes};
+        \draw[thick] (r1) -- (rr) node[midway,right,font=\tiny] {no};
+    \end{tikzpicture}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Splitting Criteria - Information Gain
+% -----------------------------------------------------------------------------
+\begin{frame}{How to Choose Splits: Information Gain}
+    \begin{defbox}[Entropy]
+        Measure of impurity/uncertainty:
+        \[
+            H(S) = -\sum_{c=1}^{C} p_c \log_2(p_c)
+        \]
+        
+        where $p_c$ = proportion of class $c$ in set $S$.
+    \end{defbox}
+    
+    \vspace{0.2cm}
+    
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \begin{defbox}[Information Gain]
+                \[
+                    IG(S, A) = H(S) - \sum_{v \in A} \frac{|S_v|}{|S|} H(S_v)
+                \]
+                
+                Choose split that maximizes $IG$!
+            \end{defbox}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.6]
+                \draw[->] (0,0) -- (4,0) node[right] {$p$};
+                \draw[->] (0,0) -- (0,2.5) node[above] {$H$};
+                
+                \draw[thick,neonpink,domain=0.01:0.99,samples=50] 
+                    plot (\x*4, {-\x*ln(\x)/ln(2) - (1-\x)*ln(1-\x)/ln(2)});
+                
+                \node[below,font=\tiny] at (0,0) {0};
+                \node[below,font=\tiny] at (2,0) {0.5};
+                \node[below,font=\tiny] at (4,0) {1};
+                
+                \fill[neongreen] (0,0) circle (2pt);
+                \fill[neongreen] (4,0) circle (2pt);
+                \fill[neonyellow] (2,2) circle (2pt);
+                
+                \node[font=\tiny,fgwhite] at (2,-0.7) {max entropy at 50/50};
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
+    
+    \begin{keybox}
+        Low entropy = pure node. High entropy = mixed node.
+    \end{keybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Gini Impurity
+% -----------------------------------------------------------------------------
+\begin{frame}{Alternative: Gini Impurity}
+    \begin{defbox}[Gini Impurity]
+        \[
+            Gini(S) = 1 - \sum_{c=1}^{C} p_c^2
+        \]
+    \end{defbox}
+    
+    \vspace{0.2cm}
+    
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \textbf{Example:}
+            
+            If $S$ has 70\% class A, 30\% class B:
+            \[
+                Gini = 1 - (0.7^2 + 0.3^2) = 1 - 0.58 = 0.42
+            \]
+            
+            If $S$ is 100\% class A:
+            \[
+                Gini = 1 - 1^2 = 0
+            \]
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{infobox}[Entropy vs Gini]
+                \begin{itemize}
+                    \item Similar results in practice
+                    \item Gini slightly faster (no log)
+                    \item Gini: default in sklearn
+                    \item Entropy: information-theoretic
+                \end{itemize}
+            \end{infobox}
+        \end{column}
+    \end{columns}
+    
+    \begin{funnybox}
+        Gini = probability of misclassifying a randomly chosen sample if it was randomly labeled.
+    \end{funnybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Building the Tree
+% -----------------------------------------------------------------------------
+\begin{frame}{Building a Decision Tree (ID3/CART)}
+    \begin{keybox}[Recursive Algorithm]
+        \textbf{BuildTree}($S$):
+        \begin{enumerate}
+            \item If all samples in $S$ have same class: return Leaf(class)
+            \item If no features left: return Leaf(majority class)
+            \item Find best feature/threshold to split on (max $IG$ or min Gini)
+            \item Split $S$ into subsets $S_1, S_2, \ldots$
+            \item Recursively: BuildTree($S_1$), BuildTree($S_2$), ...
+        \end{enumerate}
+    \end{keybox}
+    
+    \vspace{0.3cm}
+    
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \textbf{For continuous features:}
+            
+            Try all thresholds:
+            $x_i < t$ vs $x_i \geq t$
+            
+            Choose $t$ with best split.
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \textbf{For categorical features:}
+            
+            Try all subsets or
+            one-vs-rest splits.
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Overfitting in Trees
+% -----------------------------------------------------------------------------
+\begin{frame}{Overfitting: The Tree's Curse}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{alertbox}[Deep Trees Overfit!]
+                Without limits, a tree can have:
+                \begin{itemize}
+                    \item One leaf per training sample
+                    \item 100\% training accuracy
+                    \item Terrible test accuracy
+                \end{itemize}
+            \end{alertbox}
+            
+            \vspace{0.2cm}
+            
+            \begin{keybox}[Solution: Pruning]
+                Limit tree growth:
+                \begin{itemize}
+                    \item Max depth
+                    \item Min samples per leaf
+                    \item Min samples to split
+                \end{itemize}
+            \end{keybox}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.6]
+                \draw[->] (0,0) -- (5,0) node[right,font=\small] {depth};
+                \draw[->] (0,0) -- (0,3.5) node[above,font=\small] {error};
+                
+                % Training error
+                \draw[thick,neonpink,domain=0.5:4.5,samples=50] 
+                    plot (\x, {2.5*exp(-0.5*\x)});
+                \node[neonpink,font=\tiny] at (4.5,0.8) {train};
+                
+                % Test error (piecewise function)
+                \draw[thick,neongreen,domain=0.5:2,samples=25] 
+                    plot (\x, {1.5*exp(-0.3*\x)});
+                \draw[thick,neongreen,domain=2:4.5,samples=25] 
+                    plot (\x, {1.5*exp(-0.3*\x) + 0.2*(\x-2)*(\x-2)});
+                \node[neongreen,font=\tiny] at (4.5,2.5) {test};
+                
+                % Optimal depth
+                \draw[dashed,neonyellow] (2,0) -- (2,3);
+                \node[neonyellow,above,font=\tiny] at (2,3) {optimal};
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Regression Trees
+% -----------------------------------------------------------------------------
+\begin{frame}{Regression Trees}
+    \begin{defbox}[Regression Tree]
+        For continuous targets, use \textbf{variance reduction}:
+        \[
+            \text{Var}(S) = \frac{1}{|S|} \sum_{i \in S} (y_i - \bar{y})^2
+        \]
+        
+        Leaf prediction: mean of samples in that leaf.
+    \end{defbox}
+    
+    \centering
+    \begin{tikzpicture}[scale=0.8]
+        \draw[->] (0,0) -- (5,0) node[right] {$x$};
+        \draw[->] (0,0) -- (0,3) node[above] {$y$};
+        
+        % Data points
+        \foreach \x/\y in {0.5/0.8, 1/1.2, 1.5/1.0, 2.2/1.8, 2.5/2.2, 2.8/2.0, 3.5/2.6, 4/2.4, 4.3/2.8} {
+            \fill[accentcyan] (\x,\y) circle (2pt);
+        }
+        
+        % Tree prediction (step function)
+        \draw[thick,neonpink] (0,1) -- (1.8,1);
+        \draw[thick,neonpink] (1.8,2) -- (3.2,2);
+        \draw[thick,neonpink] (3.2,2.6) -- (5,2.6);
+        
+        % Split lines
+        \draw[dashed,neonyellow] (1.8,0) -- (1.8,3);
+        \draw[dashed,neonyellow] (3.2,0) -- (3.2,3);
+    \end{tikzpicture}
+    
+    \begin{funnybox}
+        Regression trees = piecewise constant approximation. Square-ish, but it works!
+    \end{funnybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Pros and Cons
+% -----------------------------------------------------------------------------
+\begin{frame}{Decision Trees: Pros and Cons}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{successbox}[Advantages]
+                \begin{itemize}
+                    \item Easy to interpret
+                    \item No scaling needed
+                    \item Handles mixed features
+                    \item Built-in feature selection
+                    \item Fast to train
+                    \item No assumptions about data
+                \end{itemize}
+            \end{successbox}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{alertbox}[Disadvantages]
+                \begin{itemize}
+                    \item Prone to overfitting
+                    \item Unstable (small data changes → different tree)
+                    \item Can't extrapolate
+                    \item Biased toward features with many values
+                    \item Greedy (local optima)
+                \end{itemize}
+            \end{alertbox}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.3cm}
+    
+    \begin{keybox}
+        Single trees are limited, but they're the building blocks for powerful \textbf{ensemble methods}!
+    \end{keybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Code Example
+% -----------------------------------------------------------------------------
+\begin{frame}{Decision Trees in Scikit-learn}
+    \begin{successbox}[Python Implementation]
+        {\small\ttfamily
+        from sklearn.tree import DecisionTreeClassifier, plot\_tree\\
+        import matplotlib.pyplot as plt\\[0.3em]
+        clf = DecisionTreeClassifier(\\
+        \quad max\_depth=3,\quad\quad\quad \# Prevent overfitting\\
+        \quad min\_samples\_leaf=5,\quad \# Min samples per leaf\\
+        \quad criterion='gini'\quad\quad \# or 'entropy'\\
+        )\\
+        clf.fit(X\_train, y\_train)\\[0.3em]
+        y\_pred = clf.predict(X\_test)\\[0.3em]
+        plt.figure(figsize=(12, 8))\\
+        plot\_tree(clf, filled=True, feature\_names=feature\_names)\\
+        plt.show()
+        }
+    \end{successbox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Key Takeaways
+% -----------------------------------------------------------------------------
+\begin{frame}{Key Takeaways: Decision Trees}
+    \begin{keybox}
+        \begin{enumerate}
+            \item \textbf{Decision trees} = recursive binary splits
+            \item \textbf{Split criteria}: Information gain (entropy) or Gini impurity
+            \item \textbf{Entropy}: $H(S) = -\sum p_c \log_2 p_c$
+            \item \textbf{Gini}: $G(S) = 1 - \sum p_c^2$
+            \item \textbf{Regression}: Use variance, predict mean
+            \item \textbf{Overfitting risk}: Always prune!
+            \begin{itemize}
+                \item Limit depth, min samples per leaf
+            \end{itemize}
+            \item \textbf{Pros}: Interpretable, fast, no preprocessing
+            \item \textbf{Cons}: Unstable, overfit easily
+        \end{enumerate}
+    \end{keybox}
+    
+    \centering
+    \textit{Next: Combining trees into powerful ensembles!}
+\end{frame}

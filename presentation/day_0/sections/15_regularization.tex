@@ -1,0 +1,485 @@
+% =============================================================================
+% Section 15: Regularization Techniques
+% Preventing overfitting: L2, Dropout, and more
+% =============================================================================
+
+\section{Regularization Techniques}
+
+% -----------------------------------------------------------------------------
+% Opening
+% -----------------------------------------------------------------------------
+\begin{frame}{Regularization: Keeping Models Humble}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{funnybox}
+                \textit{``A model that memorizes the training data is like a student who only memorizes answers — useless on a test with new questions!''}
+            \end{funnybox}
+            
+            \vspace{0.3cm}
+            
+            \textbf{The Overfitting Problem:}
+            \begin{itemize}
+                \item Training loss: LOW (YES)
+                \item Test loss: HIGH (NO)
+                \item Model memorized, didn't learn!
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.6]
+                \draw[->] (0,0) -- (4,0) node[right] {$x$};
+                \draw[->] (0,0) -- (0,3) node[above] {$y$};
+                
+                % Data points
+                \foreach \x/\y in {0.5/0.8, 1/1.5, 1.5/1.2, 2/2, 2.5/1.8, 3/2.5, 3.5/2.2} {
+                    \fill[accentcyan] (\x,\y) circle (3pt);
+                }
+                
+                % Good fit
+                \draw[thick,neongreen,domain=0.3:3.7,samples=50] plot (\x, {0.5 + 0.5*\x});
+                
+                % Overfitting
+                \draw[thick,neonpink,domain=0.4:3.6,samples=100] 
+                    plot (\x, {0.8 + 0.5*sin(3*\x r) + 0.4*\x + 0.2*sin(8*\x r)});
+                
+                \node[neongreen,font=\tiny] at (1,2.5) {good};
+                \node[neonpink,font=\tiny] at (3,3) {overfit};
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Bias-Variance Tradeoff
+% -----------------------------------------------------------------------------
+\begin{frame}{Bias-Variance Tradeoff}
+    \begin{defbox}[Decomposition of Error]
+        \[
+            \text{Error} = \text{Bias}^2 + \text{Variance} + \text{Irreducible Noise}
+        \]
+    \end{defbox}
+    
+    \vspace{0.2cm}
+    
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \begin{alertbox}[High Bias (Underfitting)]
+                Model too simple
+                \begin{itemize}
+                    \item Misses patterns
+                    \item Train error: HIGH
+                    \item Test error: HIGH
+                \end{itemize}
+            \end{alertbox}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{alertbox}[High Variance (Overfitting)]
+                Model too complex
+                \begin{itemize}
+                    \item Fits noise
+                    \item Train error: LOW
+                    \item Test error: HIGH
+                \end{itemize}
+            \end{alertbox}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.3cm}
+    
+    \begin{keybox}
+        \textbf{Regularization} reduces variance at the cost of slightly higher bias.
+        
+        Goal: Find the sweet spot!
+    \end{keybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% L2 Regularization
+% -----------------------------------------------------------------------------
+\begin{frame}{L2 Regularization (Weight Decay)}
+    \begin{defbox}[L2 Regularization]
+        Add penalty for large weights:
+        \[
+            J_{\text{reg}} = J_{\text{original}} + \frac{\lambda}{2} \sum_{l} \|W^{[l]}\|_F^2
+        \]
+        
+        where $\|W\|_F^2 = \sum_{i,j} W_{ij}^2$ (Frobenius norm)
+    \end{defbox}
+    
+    \vspace{0.2cm}
+    
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \textbf{Effect on gradient:}
+            \[
+                \frac{\partial J_{\text{reg}}}{\partial W} = \frac{\partial J}{\partial W} + \lambda W
+            \]
+            
+            Update becomes:
+            \[
+                W \leftarrow W(1 - \eta\lambda) - \eta \nabla_W J
+            \]
+            
+            \textit{Weights ``decay'' toward zero}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{keybox}[Why it works]
+                \begin{itemize}
+                    \item Penalizes complex models
+                    \item Encourages small weights
+                    \item Smooths decision boundary
+                    \item Reduces sensitivity to noise
+                \end{itemize}
+            \end{keybox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% L1 Regularization
+% -----------------------------------------------------------------------------
+\begin{frame}{L1 Regularization (Lasso)}
+    \begin{defbox}[L1 Regularization]
+        \[
+            J_{\text{reg}} = J_{\text{original}} + \lambda \sum_{l} \|W^{[l]}\|_1
+        \]
+        
+        where $\|W\|_1 = \sum_{i,j} |W_{ij}|$
+    \end{defbox}
+    
+    \vspace{0.2cm}
+    
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \begin{infobox}[L1 vs L2]
+                \textbf{L1 promotes sparsity!}
+                \begin{itemize}
+                    \item Drives some weights to exactly 0
+                    \item Feature selection built-in
+                    \item Simpler models
+                \end{itemize}
+            \end{infobox}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.6]
+                \draw[->] (-2,0) -- (2,0) node[right] {$w_1$};
+                \draw[->] (0,-2) -- (0,2) node[above] {$w_2$};
+                
+                % L2 constraint (circle)
+                \draw[thick,neongreen] (0,0) circle (1);
+                \node[neongreen,font=\tiny] at (1.5,0.8) {L2};
+                
+                % L1 constraint (diamond)
+                \draw[thick,neonpink] (-1,0) -- (0,1) -- (1,0) -- (0,-1) -- cycle;
+                \node[neonpink,font=\tiny] at (-1.3,0.8) {L1};
+                
+                % Optimal hits corner for L1
+                \fill[neonyellow] (1,0) circle (3pt);
+            \end{tikzpicture}
+            
+            \textit{L1 tends to hit corners (sparse)}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Dropout
+% -----------------------------------------------------------------------------
+\begin{frame}{Dropout: Random Deactivation}
+    \begin{defbox}[Dropout (Srivastava et al., 2014)]
+        During training, randomly set each neuron's output to 0 with probability $p$:
+        \[
+            \tilde{a}_i = \begin{cases}
+                0 & \text{with probability } p \\
+                \frac{a_i}{1-p} & \text{with probability } 1-p
+            \end{cases}
+        \]
+    \end{defbox}
+    
+    \centering
+    \begin{tikzpicture}[scale=0.7]
+        % Full network
+        \begin{scope}[xshift=0cm]
+            \node[font=\small,accentcyan] at (1.5,2) {Training};
+            \foreach \i in {1,2,3} {
+                \node[circle,draw=accentcyan,fill=darkgray,minimum size=0.5cm] (I\i) at (0,1.5-\i*0.8) {};
+            }
+            \foreach \i in {1,2,3,4} {
+                \ifnum\i=2
+                    \node[circle,draw=neonpink,fill=neonpink!30,minimum size=0.5cm,text=black,font=\bfseries] (H\i) at (1.5,2-\i*0.7) {$\times$};
+                \else\ifnum\i=4
+                    \node[circle,draw=neonpink,fill=neonpink!30,minimum size=0.5cm,text=black,font=\bfseries] (H\i) at (1.5,2-\i*0.7) {$\times$};
+                \else
+                    \node[circle,draw=neongreen,fill=darkgray,minimum size=0.5cm] (H\i) at (1.5,2-\i*0.7) {};
+                \fi\fi
+            }
+            \foreach \i in {1,2} {
+                \node[circle,draw=accentcyan,fill=darkgray,minimum size=0.5cm] (O\i) at (3,0.8-\i*0.8) {};
+            }
+            
+            \foreach \i in {1,2,3} {
+                \foreach \j in {1,3} {
+                    \draw[connection,opacity=0.6] (I\i) -- (H\j);
+                }
+            }
+            \foreach \j in {1,3} {
+                \foreach \k in {1,2} {
+                    \draw[connection,opacity=0.6] (H\j) -- (O\k);
+                }
+            }
+        \end{scope}
+        
+        % Test network
+        \begin{scope}[xshift=5cm]
+            \node[font=\small,neongreen] at (1.5,2) {Testing};
+            \foreach \i in {1,2,3} {
+                \node[circle,draw=accentcyan,fill=darkgray,minimum size=0.5cm] (I\i) at (0,1.5-\i*0.8) {};
+            }
+            \foreach \i in {1,2,3,4} {
+                \node[circle,draw=neongreen,fill=darkgray,minimum size=0.5cm] (H\i) at (1.5,2-\i*0.7) {};
+            }
+            \foreach \i in {1,2} {
+                \node[circle,draw=accentcyan,fill=darkgray,minimum size=0.5cm] (O\i) at (3,0.8-\i*0.8) {};
+            }
+            
+            \foreach \i in {1,2,3} {
+                \foreach \j in {1,2,3,4} {
+                    \draw[connection,opacity=0.4] (I\i) -- (H\j);
+                }
+            }
+            \foreach \j in {1,2,3,4} {
+                \foreach \k in {1,2} {
+                    \draw[connection,opacity=0.4] (H\j) -- (O\k);
+                }
+            }
+            
+            \node[below,font=\tiny,fgwhite] at (1.5,-1.5) {(all neurons, scaled)};
+        \end{scope}
+    \end{tikzpicture}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Why Dropout Works
+% -----------------------------------------------------------------------------
+\begin{frame}{Why Dropout Works}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{keybox}[Intuitions]
+                \begin{itemize}
+                    \item \textbf{Ensemble effect}: Training many sub-networks
+                    \item \textbf{Redundancy}: Can't rely on any single feature
+                    \item \textbf{Co-adaptation prevention}: Features must be useful alone
+                \end{itemize}
+            \end{keybox}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{infobox}[Typical Values]
+                \begin{itemize}
+                    \item Input layer: $p = 0.2$
+                    \item Hidden layers: $p = 0.5$
+                    \item Output layer: No dropout
+                \end{itemize}
+                
+                \vspace{0.2cm}
+                
+                \textit{Higher $p$ = more regularization}
+            \end{infobox}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.3cm}
+    
+    \begin{funnybox}
+        Dropout is like studying for an exam knowing some of your brain cells will randomly fail. You learn to be robust!
+    \end{funnybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Batch Normalization
+% -----------------------------------------------------------------------------
+\begin{frame}{Batch Normalization}
+    \begin{defbox}[Batch Normalization (Ioffe \& Szegedy, 2015)]
+        Normalize activations across the batch:
+        \[
+            \hat{x}_i = \frac{x_i - \mu_B}{\sqrt{\sigma_B^2 + \epsilon}}
+        \]
+        
+        Then scale and shift:
+        \[
+            y_i = \gamma \hat{x}_i + \beta
+        \]
+        
+        where $\gamma$ and $\beta$ are learnable parameters.
+    \end{defbox}
+    
+    \vspace{0.2cm}
+    
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \textbf{Benefits:}
+            \begin{itemize}
+                \item Stabilizes training
+                \item Allows higher learning rates
+                \item Mild regularization effect
+                \item Reduces internal covariate shift
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{keybox}
+                Apply BatchNorm \textbf{before} or \textbf{after} activation.
+                
+                Typical placement: after linear, before ReLU.
+            \end{keybox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Early Stopping
+% -----------------------------------------------------------------------------
+\begin{frame}{Early Stopping}
+    \begin{defbox}[Early Stopping]
+        Stop training when validation loss starts increasing.
+    \end{defbox}
+    
+    \centering
+    \begin{tikzpicture}[scale=0.8]
+        \draw[->] (0,0) -- (6,0) node[right] {epochs};
+        \draw[->] (0,0) -- (0,3.5) node[above] {loss};
+        
+        % Training loss
+        \draw[thick,neonpink,domain=0.2:5.5,samples=50] 
+            plot (\x, {2.5*exp(-0.4*\x) + 0.2});
+        \node[neonpink,font=\small] at (5,0.7) {train};
+        
+        % Validation loss
+        \draw[thick,neongreen,domain=0.2:5.5,samples=50] 
+            plot (\x, {2.5*exp(-0.4*\x) + 0.3 + 0.1*max(0,\x-2.5)*max(0,\x-2.5)});
+        \node[neongreen,font=\small] at (5,2) {valid};
+        
+        % Early stopping point
+        \draw[dashed,neonyellow] (2.5,0) -- (2.5,3);
+        \node[neonyellow,above,font=\small] at (2.5,3) {STOP};
+        
+        % Overfitting region
+        \fill[neonpink,opacity=0.2] (2.5,0) rectangle (5.5,3);
+        \node[fgwhite,font=\tiny] at (4,1.5) {overfitting};
+    \end{tikzpicture}
+    
+    \begin{keybox}
+        \textbf{Patience}: Wait $k$ epochs before stopping (to avoid noise).
+        
+        Save model at best validation loss!
+    \end{keybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Data Augmentation
+% -----------------------------------------------------------------------------
+\begin{frame}{Data Augmentation}
+    \begin{defbox}[Data Augmentation]
+        Create more training data by applying transformations:
+        \begin{itemize}
+            \item Images: rotation, flip, crop, color jitter
+            \item Text: synonym replacement, back-translation
+            \item Audio: pitch shift, time stretch, noise injection
+        \end{itemize}
+    \end{defbox}
+    
+    \vspace{0.3cm}
+    
+    \centering
+    \begin{tikzpicture}[scale=0.7]
+        % Original
+        \draw[thick,accentcyan,rounded corners] (0,0) rectangle (1.5,1.5);
+        \node[font=\Large] at (0.75,0.75) {CAT};
+        \node[below,fgwhite,font=\small] at (0.75,-0.2) {original};
+        
+        % Arrow
+        \draw[->,thick,neonyellow] (2,0.75) -- (3,0.75);
+        
+        % Augmented versions
+        \begin{scope}[xshift=3.5cm]
+            \draw[thick,neonpink,rounded corners] (0,0) rectangle (1.2,1.2);
+            \node[font=\normalsize,rotate=15] at (0.6,0.6) {CAT};
+        \end{scope}
+        
+        \begin{scope}[xshift=5cm]
+            \draw[thick,neonpink,rounded corners] (0,0) rectangle (1.2,1.2);
+            \node[font=\normalsize,xscale=-1] at (0.6,0.6) {CAT};
+        \end{scope}
+        
+        \begin{scope}[xshift=6.5cm]
+            \draw[thick,neonpink,rounded corners] (0,0) rectangle (1.2,1.2);
+            \node[font=\small] at (0.6,0.6) {CAT};
+        \end{scope}
+        
+        \begin{scope}[xshift=8cm]
+            \draw[thick,neonpink,rounded corners,fill=darkgray!50] (0,0) rectangle (1.2,1.2);
+            \node[font=\normalsize,opacity=0.7] at (0.6,0.6) {CAT};
+        \end{scope}
+        
+        \node[below,fgwhite,font=\small] at (6,0) {augmented copies};
+    \end{tikzpicture}
+    
+    \vspace{0.2cm}
+    
+    \begin{funnybox}
+        The same cat is still a cat whether it's rotated, flipped, or darker!
+    \end{funnybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Summary
+% -----------------------------------------------------------------------------
+\begin{frame}{Regularization Summary}
+    \begin{tabular}{lll}
+        \textbf{Technique} & \textbf{Effect} & \textbf{When to Use} \\
+        \hline
+        L2 (Weight Decay) & Shrinks weights & Almost always \\
+        L1 (Lasso) & Sparse weights & Feature selection \\
+        Dropout & Random deactivation & Deep networks \\
+        Batch Norm & Normalize activations & Deep networks \\
+        Early Stopping & Stop training early & Always \\
+        Data Augmentation & More training data & Images, audio \\
+    \end{tabular}
+    
+    \vspace{0.5cm}
+    
+    \begin{keybox}
+        \textbf{Best practice}: Combine multiple techniques!
+        \begin{itemize}
+            \item L2 regularization (almost always)
+            \item Dropout (hidden layers)
+            \item BatchNorm (deep networks)
+            \item Early stopping (monitor validation)
+            \item Data augmentation (when possible)
+        \end{itemize}
+    \end{keybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Key Takeaways
+% -----------------------------------------------------------------------------
+\begin{frame}{Key Takeaways: Regularization}
+    \begin{keybox}
+        \begin{enumerate}
+            \item \textbf{Overfitting}: Low train error, high test error
+            \item \textbf{Regularization} trades bias for lower variance
+            \item \textbf{L2/L1}: Add weight penalty to loss
+            \begin{itemize}
+                \item L2: Shrinks all weights
+                \item L1: Drives some to zero (sparse)
+            \end{itemize}
+            \item \textbf{Dropout}: Randomly disable neurons (training only!)
+            \item \textbf{BatchNorm}: Normalize activations per batch
+            \item \textbf{Early stopping}: Monitor validation loss
+            \item \textbf{Data augmentation}: Create more training data
+            \item Combine multiple techniques for best results
+        \end{enumerate}
+    \end{keybox}
+    
+    \centering
+    \textit{Next: Decision Trees — a different approach to learning!}
+\end{frame}

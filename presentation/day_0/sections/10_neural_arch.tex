@@ -1,0 +1,466 @@
+% =============================================================================
+% Section 10: Neural Network Architectures
+% Multi-layer perceptrons and network design
+% =============================================================================
+
+\section{Neural Network Architectures}
+
+% -----------------------------------------------------------------------------
+% From Single Neuron to Layers
+% -----------------------------------------------------------------------------
+\begin{frame}{From Single Neuron to Networks}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{funnybox}
+                \textit{``One neuron is smart. Many neurons together are... either genius or chaos. Let's aim for genius.''}
+            \end{funnybox}
+            
+            \vspace{0.3cm}
+            
+            \textbf{Why go deeper?}
+            \begin{itemize}
+                \item Single neuron: linear decision boundary
+                \item Multiple neurons: complex patterns
+                \item More layers: hierarchical features
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \centering
+            % Single neuron limitation
+            \begin{tikzpicture}[scale=0.8]
+                \node[font=\small,accentcyan] at (1.5,2.5) {Single Neuron};
+                \draw[->] (0,0) -- (3,0);
+                \draw[->] (0,0) -- (0,2);
+                
+                % XOR problem - can't separate
+                \fill[neongreen] (0.5,0.5) circle (3pt);
+                \fill[neongreen] (2,1.5) circle (3pt);
+                \fill[neonpink] (0.5,1.5) circle (3pt);
+                \fill[neonpink] (2,0.5) circle (3pt);
+                
+                % Linear separator - fails
+                \draw[dashed,neonyellow] (0,1) -- (3,1);
+                \node[font=\tiny,fgwhite] at (1.5,-0.5) {Can't separate XOR!};
+            \end{tikzpicture}
+            
+            \vspace{0.3cm}
+            
+            \begin{tikzpicture}[scale=0.6]
+                \node[font=\small,neonpink] at (1.5,2.5) {Multi-Layer};
+                \draw[->] (0,0) -- (3,0);
+                \draw[->] (0,0) -- (0,2);
+                
+                % XOR problem - separated
+                \fill[neongreen] (0.5,0.5) circle (3pt);
+                \fill[neongreen] (2,1.5) circle (3pt);
+                \fill[neonpink] (0.5,1.5) circle (3pt);
+                \fill[neonpink] (2,0.5) circle (3pt);
+                
+                % Non-linear separator
+                \draw[thick,neonyellow] (0.5,1) .. controls (1.25,0.5) .. (2,1);
+                \draw[thick,neonyellow] (0.5,1) .. controls (1.25,1.5) .. (2,1);
+                
+                \node[font=\tiny,fgwhite] at (1.5,-0.5) {Can separate!};
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Multi-Layer Perceptron
+% -----------------------------------------------------------------------------
+\begin{frame}{Multi-Layer Perceptron (MLP)}
+    \begin{defbox}[MLP]
+        A \glow{Multi-Layer Perceptron} consists of:
+        \begin{itemize}
+            \item \textbf{Input layer}: receives data
+            \item \textbf{Hidden layers}: intermediate computations
+            \item \textbf{Output layer}: produces predictions
+        \end{itemize}
+    \end{defbox}
+    
+    \vspace{0.2cm}
+    
+    \centering
+    \begin{tikzpicture}[scale=0.80]
+        % Input layer
+        \foreach \i in {1,2,3,4} {
+            \node[input neuron] (I\i) at (0, 3-\i) {$x_\i$};
+        }
+        
+        % Hidden layer 1
+        \foreach \i in {1,2,3,4,5} {
+            \node[hidden neuron] (H1\i) at (2.5, 3.5-\i) {};
+        }
+        
+        % Hidden layer 2
+        \foreach \i in {1,2,3,4} {
+            \node[hidden neuron] (H2\i) at (5, 3-\i) {};
+        }
+        
+        % Output layer
+        \foreach \i in {1,2} {
+            \node[output neuron] (O\i) at (7.5, 1.5-\i+1) {$y_\i$};
+        }
+        
+        % Connections
+        \foreach \i in {1,2,3,4} {
+            \foreach \j in {1,2,3,4,5} {
+                \draw[connection,opacity=0.5] (I\i) -- (H1\j);
+            }
+        }
+        
+        \foreach \i in {1,2,3,4,5} {
+            \foreach \j in {1,2,3,4} {
+                \draw[connection,opacity=0.5] (H1\i) -- (H2\j);
+            }
+        }
+        
+        \foreach \i in {1,2,3,4} {
+            \foreach \j in {1,2} {
+                \draw[connection,opacity=0.5] (H2\i) -- (O\j);
+            }
+        }
+        
+        % Labels
+        \node[neongreen,below] at (0,-1.2) {Input (4)};
+        \node[accentcyan,below] at (2.5,-1.7) {Hidden 1 (5)};
+        \node[accentcyan,below] at (5,-1.2) {Hidden 2 (4)};
+        \node[neonpink,below] at (7.5,-0.7) {Output (2)};
+    \end{tikzpicture}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Layer Math
+% -----------------------------------------------------------------------------
+\begin{frame}{Layer-wise Computation}
+    \begin{defbox}[Layer Computation]
+        For layer $l$ with $n_{l-1}$ inputs and $n_l$ outputs:
+        \[
+            \mathbf{a}^{[l]} = \sigma\left(W^{[l]} \mathbf{a}^{[l-1]} + \mathbf{b}^{[l]}\right)
+        \]
+        
+        Where:
+        \begin{itemize}
+            \item $W^{[l]} \in \mathbb{R}^{n_l \times n_{l-1}}$: weight matrix
+            \item $\mathbf{b}^{[l]} \in \mathbb{R}^{n_l}$: bias vector
+            \item $\mathbf{a}^{[l]} \in \mathbb{R}^{n_l}$: activations (output)
+        \end{itemize}
+    \end{defbox}
+    
+    \vspace{0.3cm}
+    
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \textbf{Dimensions matter!}
+            
+            \begin{align*}
+                \text{Input: } & \mathbf{x} \in \mathbb{R}^{4} \\
+                W^{[1]} &\in \mathbb{R}^{5 \times 4} \\
+                \mathbf{a}^{[1]} &= \sigma(W^{[1]}\mathbf{x} + \mathbf{b}^{[1]}) \in \mathbb{R}^{5}
+            \end{align*}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{keybox}
+                Matrix multiplication handles all neurons in a layer simultaneously!
+                
+                \vspace{0.1cm}
+                
+                \textit{Vectorization = speed}
+            \end{keybox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Notation
+% -----------------------------------------------------------------------------
+\begin{frame}{Notation Convention}
+    \begin{defbox}[Standard Notation]
+        \begin{tabular}{ll}
+            $L$ & Total number of layers \\
+            $n^{[l]}$ & Number of neurons in layer $l$ \\
+            $W^{[l]}$ & Weights from layer $l-1$ to $l$ \\
+            $\mathbf{b}^{[l]}$ & Biases for layer $l$ \\
+            $\mathbf{z}^{[l]}$ & Pre-activation: $W^{[l]}\mathbf{a}^{[l-1]} + \mathbf{b}^{[l]}$ \\
+            $\mathbf{a}^{[l]}$ & Post-activation: $\sigma(\mathbf{z}^{[l]})$ \\
+            $\mathbf{a}^{[0]} = \mathbf{x}$ & Input \\
+            $\mathbf{a}^{[L]} = \hat{\mathbf{y}}$ & Output (prediction)
+        \end{tabular}
+    \end{defbox}
+    
+    \vspace{0.3cm}
+    
+    \begin{funnybox}
+        Superscript $[l]$ = layer number, not exponent!
+        
+        $W^{[2]}$ means ``weights of layer 2'', not ``$W$ squared''
+    \end{funnybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Full Forward Pass
+% -----------------------------------------------------------------------------
+\begin{frame}{Full Forward Pass}
+    \begin{keybox}[Forward Propagation]
+        For a network with $L$ layers:
+        
+        \vspace{0.2cm}
+        
+        \begin{enumerate}
+            \item Input: $\mathbf{a}^{[0]} = \mathbf{x}$
+            \item For $l = 1, 2, \ldots, L$:
+            \begin{align*}
+                \mathbf{z}^{[l]} &= W^{[l]} \mathbf{a}^{[l-1]} + \mathbf{b}^{[l]} \\
+                \mathbf{a}^{[l]} &= \sigma_l(\mathbf{z}^{[l]})
+            \end{align*}
+            \item Output: $\hat{\mathbf{y}} = \mathbf{a}^{[L]}$
+        \end{enumerate}
+    \end{keybox}
+    
+    \vspace{0.3cm}
+    
+    \centering
+    \begin{tikzpicture}[scale=0.7]
+        % Flow diagram
+        \node[draw=neongreen,rounded corners,fill=darkgray] (x) at (0,0) {$\mathbf{x}$};
+        \node[draw=accentcyan,rounded corners,fill=darkgray] (z1) at (2.5,0) {$\mathbf{z}^{[1]}$};
+        \node[draw=accentcyan,rounded corners,fill=darkgray] (a1) at (5,0) {$\mathbf{a}^{[1]}$};
+        \node[draw=accentcyan,rounded corners,fill=darkgray] (z2) at (7.5,0) {$\mathbf{z}^{[2]}$};
+        \node[draw=neonpink,rounded corners,fill=darkgray] (y) at (10,0) {$\hat{\mathbf{y}}$};
+        
+        \draw[->,thick,neonyellow] (x) -- (z1) node[midway,above,font=\tiny] {$W^{[1]}, \mathbf{b}^{[1]}$};
+        \draw[->,thick,neonyellow] (z1) -- (a1) node[midway,above,font=\tiny] {$\sigma$};
+        \draw[->,thick,neonyellow] (a1) -- (z2) node[midway,above,font=\tiny] {$W^{[2]}, \mathbf{b}^{[2]}$};
+        \draw[->,thick,neonyellow] (z2) -- (y) node[midway,above,font=\tiny] {$\sigma$};
+    \end{tikzpicture}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Network Width and Depth
+% -----------------------------------------------------------------------------
+\begin{frame}{Width vs Depth}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{defbox}[Width]
+                \glow{Width} = number of neurons per layer
+                
+                \centering
+                \begin{tikzpicture}[scale=0.5]
+                    \foreach \i in {1,...,6} {
+                        \node[circle,draw=accentcyan,fill=darkgray,minimum size=0.4cm] at (0,3-0.5*\i) {};
+                    }
+                    \foreach \i in {1,...,6} {
+                        \node[circle,draw=accentcyan,fill=darkgray,minimum size=0.4cm] at (2,3-0.5*\i) {};
+                    }
+                \end{tikzpicture}
+                
+                Wide network
+            \end{defbox}
+            
+            \textbf{More width:}
+            \begin{itemize}
+                \item More parameters per layer
+                \item Can memorize more patterns
+                \item Risk of overfitting
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{defbox}[Depth]
+                \glow{Depth} = number of layers
+                
+                \centering
+                \begin{tikzpicture}[scale=0.5]
+                    \foreach \l in {0,1.5,3,4.5} {
+                        \foreach \i in {1,2,3} {
+                            \node[circle,draw=neonpink,fill=darkgray,minimum size=0.4cm] at (\l,1.5-0.5*\i) {};
+                        }
+                    }
+                \end{tikzpicture}
+                
+                Deep network
+            \end{defbox}
+            
+            \textbf{More depth:}
+            \begin{itemize}
+                \item Hierarchical features
+                \item More expressive (often)
+                \item Harder to train
+            \end{itemize}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.3cm}
+    
+    \begin{funnybox}
+        \textit{``Deep Learning''} = lots of layers. Who would have guessed?
+    \end{funnybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Hidden Layer Features
+% -----------------------------------------------------------------------------
+\begin{frame}{What Do Hidden Layers Learn?}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{infobox}[Feature Hierarchy]
+                Each layer learns increasingly abstract features:
+                
+                \vspace{0.2cm}
+                
+                \textbf{Image Recognition Example:}
+                \begin{enumerate}
+                    \item Layer 1: Edges, gradients
+                    \item Layer 2: Textures, patterns
+                    \item Layer 3: Parts (eyes, wheels)
+                    \item Layer 4+: Objects, concepts
+                \end{enumerate}
+            \end{infobox}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.7]
+                % Hierarchy visualization
+                \node[draw=neongreen,rounded corners,minimum width=2cm] (in) at (0,0) {Pixels};
+                \node[draw=accentcyan,rounded corners,minimum width=2cm] (l1) at (0,-1.2) {Edges};
+                \node[draw=accentcyan,rounded corners,minimum width=2cm] (l2) at (0,-2.4) {Textures};
+                \node[draw=accentcyan,rounded corners,minimum width=2cm] (l3) at (0,-3.6) {Parts};
+                \node[draw=neonpink,rounded corners,minimum width=2cm] (out) at (0,-4.8) {``Cat''};
+                
+                \draw[->,thick,neonyellow] (in) -- (l1);
+                \draw[->,thick,neonyellow] (l1) -- (l2);
+                \draw[->,thick,neonyellow] (l2) -- (l3);
+                \draw[->,thick,neonyellow] (l3) -- (out);
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.3cm}
+    
+    \begin{keybox}
+        Hidden layers = learned feature extractors. They transform raw data into useful representations!
+    \end{keybox}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Output Layer Design
+% -----------------------------------------------------------------------------
+\begin{frame}{Output Layer Design}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{defbox}[Binary Classification]
+                \textbf{1 output neuron} with sigmoid
+                
+                \[
+                    P(y=1|\mathbf{x}) = \sigma(z) \in (0, 1)
+                \]
+                
+                \textit{Is it a cat? Yes/No}
+            \end{defbox}
+            
+            \vspace{0.3cm}
+            
+            \begin{defbox}[Regression]
+                \textbf{1 output neuron} (no activation or linear)
+                
+                \[
+                    \hat{y} = z \in \mathbb{R}
+                \]
+                
+                \textit{Predict house price}
+            \end{defbox}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{defbox}[Multi-class Classification]
+                \textbf{$K$ output neurons} with softmax
+                
+                \[
+                    P(y=k|\mathbf{x}) = \frac{e^{z_k}}{\sum_{j=1}^{K} e^{z_j}}
+                \]
+                
+                Outputs sum to 1!
+                
+                \textit{Cat, dog, or bird?}
+            \end{defbox}
+            
+            \vspace{0.2cm}
+            
+            \begin{keybox}
+                Softmax = ``soft'' version of argmax
+                
+                Converts scores to probabilities
+            \end{keybox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Parameter Count
+% -----------------------------------------------------------------------------
+\begin{frame}{Counting Parameters}
+    \begin{defbox}[Parameter Count]
+        For a fully connected layer from $n_{in}$ to $n_{out}$:
+        
+        \[
+            \text{Parameters} = n_{out} \times n_{in} + n_{out} = n_{out}(n_{in} + 1)
+        \]
+        
+        (weights + biases)
+    \end{defbox}
+    
+    \vspace{0.3cm}
+    
+    \textbf{Example: Network [4, 5, 4, 2]}
+    
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \begin{align*}
+                \text{Layer 1: } & 5 \times 4 + 5 = 25 \\
+                \text{Layer 2: } & 4 \times 5 + 4 = 24 \\
+                \text{Layer 3: } & 2 \times 4 + 2 = 10 \\
+                \hline
+                \text{Total: } & 59 \text{ parameters}
+            \end{align*}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{funnybox}
+                GPT-3 has 175 \textbf{billion} parameters.
+                
+                \vspace{0.1cm}
+                
+                Our example: 59.
+                
+                \vspace{0.1cm}
+                
+                \textit{We all start somewhere!}
+            \end{funnybox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Key Takeaways
+% -----------------------------------------------------------------------------
+\begin{frame}{Key Takeaways: Network Architectures}
+    \begin{keybox}
+        \begin{enumerate}
+            \item \textbf{MLP}: Input → Hidden layers → Output
+            \item \textbf{Layer computation}: $\mathbf{a}^{[l]} = \sigma(W^{[l]} \mathbf{a}^{[l-1]} + \mathbf{b}^{[l]})$
+            \item \textbf{Forward pass}: Sequentially apply all layers
+            \item \textbf{Width} vs \textbf{Depth}: Different trade-offs
+            \item \textbf{Hidden layers learn features} at increasing abstraction
+            \item \textbf{Output layer design}:
+            \begin{itemize}
+                \item Binary: sigmoid (1 output)
+                \item Multi-class: softmax ($K$ outputs)
+                \item Regression: linear (1 output)
+            \end{itemize}
+            \item \textbf{Parameters}: Weights + Biases per layer
+        \end{enumerate}
+    \end{keybox}
+    
+    \vspace{0.2cm}
+    
+    \centering
+    \textit{Next: How does information flow forward through the network?}
+\end{frame}
