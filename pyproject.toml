@@ -1,0 +1,181 @@
+[project]
+name = "ml-workshop"
+version = "0.1.0"
+description = "ML Workshop: From Numbers to Neural Networks - A comprehensive journey into machine learning fundamentals"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+authors = [
+    { name = "Shuvam Banerji Seal", email = "sbs22ms076@iiserkol.ac.in" }
+]
+keywords = ["machine-learning", "neural-networks", "deep-learning", "pytorch", "education"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Education",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Education",
+]
+
+dependencies = [
+    # Core numerical computing
+    "numpy>=1.26.0",
+    "pandas>=2.1.0",
+    
+    # Deep learning
+    "torch>=2.1.0",
+    #"torch==2.1.1+cpu",
+    "torchvision>=0.16.0",
+    
+    # Visualization
+    "matplotlib>=3.8.0",
+    "seaborn>=0.13.0",
+    
+    # Machine learning
+    "scikit-learn>=1.3.0",
+    "xgboost>=2.0.0",
+    
+    # Jupyter notebooks
+    "jupyter>=1.0.0",
+    "jupyterlab>=4.0.0",
+    "ipykernel>=6.26.0",
+    "ipywidgets>=8.1.0",
+    "notebook>=7.0.0",
+    
+    # Utilities
+    "tqdm>=4.66.0",
+    "pillow>=10.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    # Testing
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    
+    # Code quality
+    "black>=23.11.0",
+    "ruff>=0.1.6",
+    "mypy>=1.7.0",
+    
+    # Type stubs
+    "types-requests>=2.31.0",
+    "pandas-stubs>=2.1.0",
+]
+
+manim = [
+    # For 3Blue1Brown style animations (optional)
+    "manim>=0.18.0",
+    "manimgl>=1.6.1",
+]
+
+all = [
+    "ml-workshop[dev,manim]",
+]
+
+[project.urls]
+Homepage = "https://github.com/Shuvam-Banerji-Seal/slashdot_ml_workshop"
+Repository = "https://github.com/Shuvam-Banerji-Seal/slashdot_ml_workshop"
+Issues = "https://github.com/Shuvam-Banerji-Seal/slashdot_ml_workshop/issues"
+
+[project.scripts]
+ml-workshop = "ml_workshop.main:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "black>=23.11.0",
+    "ruff>=0.1.6",
+    "mypy>=1.7.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+# UV sources for PyTorch (use CPU version by default, users can override for CUDA)
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.black]
+line-length = 88
+target-version = ["py312"]
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "N",   # pep8-naming
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "SIM", # flake8-simplify
+]
+ignore = [
+    "E501",  # line too long (handled by black)
+    "B008",  # do not perform function calls in argument defaults
+]
+
+[tool.ruff.per-file-ignores]
+"__init__.py" = ["F401"]  # Allow unused imports in __init__.py
+
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+check_untyped_defs = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+
+[[tool.mypy.overrides]]
+module = [
+    "sklearn.*",
+    "xgboost.*",
+    "seaborn.*",
+    "matplotlib.*",
+]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-markers",
+    "--cov=ml_workshop",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+]

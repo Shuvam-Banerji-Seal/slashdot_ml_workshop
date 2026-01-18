@@ -228,6 +228,9 @@ NOTES.md
 .DS_Store
 Thumbs.db
 
-
-# my sty
+#keeping the sty here
 presentation/global/sbs_dark_beamer.sty
+
+# UV specific
+.python-version
+uv.lock
